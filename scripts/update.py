@@ -19,17 +19,17 @@ HEADERS = {
     "Accept": "application/json,text/plain;q=0.9,*/*;q=0.5",
 }
 
-def download(url, timeout=35):
+def download(url, timeout=15):
     error = None
-    for attempt in range(3):
+    for attempt in range(2):
         try:
             req = urllib.request.Request(url, headers=HEADERS)
             with urllib.request.urlopen(req, timeout=timeout) as response:
                 return response.read().decode("utf-8")
         except Exception as ex:
             error = ex
-            if attempt < 2:
-                time.sleep(3 * (attempt + 1))
+            if attempt < 1:
+                time.sleep(2 * (attempt + 1))
     raise RuntimeError(str(error))
 
 def api(base, params):
@@ -43,7 +43,6 @@ def forecast():
     params = dict(
         latitude=52.101, longitude=5.18,
         daily="temperature_2m_min,temperature_2m_max,wind_direction_10m_dominant,snowfall_sum",
-        hourly="wind_speed_250hPa,wind_direction_250hPa",
         timezone="Europe/Amsterdam", forecast_days=14
     )
     try:
