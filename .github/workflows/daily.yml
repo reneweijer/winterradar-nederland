@@ -1,0 +1,50 @@
+name: Winterradar — dagelijkse update en publicatie
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    - cron: '23 5 * * *' # 05:23 UTC = 06:23 wintertijd / 07:23 zomertijd
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: winterradar-pages
+  cancel-in-progress: false
+
+jobs:
+  collect-and-deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Repository ophalen
+        uses: actions/checkout@v4
+      - name: Python instellen
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Weergegevens en NAO/AO ophalen
+        run: python scripts/update.py
+      - name: Websitebestanden samenstellen
+        shell: bash
+        run: |
+          mkdir -p dist/data
+          cp index.html dist/index.html
+          cp data/latest.json dist/data/latest.json
+          touch dist/.nojekyll
+      - name: GitHub Pages configureren
+        uses: actions/configure-pages@v5
+      - name: Website-artifact uploaden
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+      - name: Website publiceren
+        id: deployment
+        uses: actions/deploy-pages@v4
