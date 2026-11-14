@@ -1,0 +1,21 @@
+/* Per-source data health: newest, last-known-good and unavailable. */
+.health-panel{padding:15px 18px;margin:10px 0 20px;border:1px solid #365c72;border-radius:17px;background:linear-gradient(135deg,#102c41,#0b2034);color:#d8eaf4}
+.health-rowtop{display:flex;gap:12px;justify-content:space-between;align-items:center;flex-wrap:wrap}
+.health-head{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:750}
+.health-icon{font-size:20px}
+.health-ok{color:#8de1c7;font-size:13px;font-weight:650}
+.health-warn{color:#ffd59b;font-size:13px;font-weight:650}
+.health-panel summary{cursor:pointer;font-size:13px;color:#b6d3e4;list-style-position:inside;padding:8px 0}
+.health-panel details{margin-top:9px;border-top:1px solid #31556d}
+.health-table{width:100%;border-collapse:collapse;font-size:12px;margin:6px 0}
+.health-table td{border-bottom:1px solid #27465b;padding:9px 5px;vertical-align:middle}
+.health-table td:first-child{font-weight:600;color:#d1e4ee}
+.health-table td:last-child{color:#b4ccd9;text-align:right}
+.health-mark{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;background:#7e93a6}
+.health-mark.fresh,.health-mark.browser,.health-mark.official{background:#76d7ba}
+.health-mark.cached{background:#ffc47c}
+.health-mark.missing,.health-mark.stale{background:#f98f88}
+.health-mark.unknown{background:#a9bacc}
+.health-stamp{font-size:11px;color:#95b4c7;line-height:1.5;margin-top:8px}
+.health-partial{border-color:#94744a!important;color:#ffcd8d!important}
+@media(max-width:560px){.health-panel{padding:13px}.health-rowtop{align-items:flex-start}.health-table td{font-size:11px;padding:10px 3px}.health-table td:first-child{max-width:125px}.health-table td:last-child{max-width:190px}}
