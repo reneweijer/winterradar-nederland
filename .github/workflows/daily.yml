@@ -5,7 +5,7 @@ on:
     branches: [main]
   workflow_dispatch:
   schedule:
-    - cron: '23 5 * * *' # 05:23 UTC = 06:23 wintertijd / 07:23 zomertijd
+    - cron: '23 5,11,17,23 * * *' # Vier pogingen per dag om tijdelijke bronstoringen op te vangen
 
 permissions:
   contents: read
@@ -36,6 +36,8 @@ jobs:
           python -m py_compile scripts/update.py scripts/winter_v2.py scripts/data_quality.py
           PYTHONPATH=scripts python scripts/test_data_quality.py
           node --check assets/winter-v2.js
+          node --check assets/data-health.js
+          node --check assets/historical-backtest.js
       - name: Herstel vorige geldige brongegevens uit cache
         id: restore-weather-cache
         uses: actions/cache/restore@v4
