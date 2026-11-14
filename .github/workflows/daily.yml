@@ -33,11 +33,14 @@ jobs:
           python-version: '3.12'
       - name: Controleer Python en dashboardlogica
         run: |
-          python -m py_compile scripts/update.py scripts/winter_v2.py scripts/data_quality.py
+          python -m py_compile scripts/update.py scripts/winter_v2.py scripts/data_quality.py scripts/outlook.py
           PYTHONPATH=scripts python scripts/test_data_quality.py
+          PYTHONPATH=scripts python scripts/test_outlook.py
           node --check assets/winter-v2.js
           node --check assets/data-health.js
           node --check assets/historical-backtest.js
+          node --check assets/kou-radar.js
+          node scripts/test_kou_radar.cjs
       - name: Herstel vorige geldige brongegevens uit cache
         id: restore-weather-cache
         uses: actions/cache/restore@v4
