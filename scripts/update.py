@@ -14,6 +14,7 @@ import pathlib
 import time
 import urllib.parse
 import urllib.request
+from winter_v2 import regional_forecast, previous_snapshot
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 OUT = ROOT / "data" / "latest.json"
@@ -175,10 +176,12 @@ def main():
     ]
     result = dict(
         collected_at=now.isoformat(), forecast=None,
-        ensemble=None, snow=None, upper_air=None, vortex=None, indices={}, errors={}
+        ensemble=None, snow=None, upper_air=None, vortex=None, europe=None, previous=None, indices={}, errors={}
     )
+    result["previous"] = previous_snapshot(download)
     operations = {
         "forecast": forecast,
+        "europe": lambda: regional_forecast(api),
         "ensemble": lambda: api(
             "https://ensemble-api.open-meteo.com/v1/ensemble",
             dict(latitude=52.101,longitude=5.18,
