@@ -14,7 +14,9 @@ import pathlib
 import time
 import urllib.parse
 import urllib.request
+from concurrent.futures import ThreadPoolExecutor
 from winter_v2 import regional_forecast, previous_snapshot
+from data_quality import merge_sources
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 OUT = ROOT / "data" / "latest.json"
@@ -197,13 +199,16 @@ def main():
                  hourly="snow_depth,temperature_2m",
                  forecast_days=2,timezone="UTC")),
     }
-    for name, fn in operations.items():
-        try:
-            result[name] = fn()
-            print("OK", name)
-        except Exception as ex:
-            result["errors"][name] = str(ex)[:250]
-            print("UNAVAILABLE", name, ex)
+    # Independent APIs: one slow or unavailable model does not block all the others.
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        futures = {name: pool.submit(fn) for name, fn in operations.items()}
+        for name, future in futures.items():
+            try:
+                result[name] = future.result()
+                print("OK", name)
+            except Exception as ex:
+                result["errors"][name] = str(ex)[:250]
+                print("UNAVAILABLE", name, ex)
 
     for name,url in {
         "nao":"https://ftp.cpc.ncep.noaa.gov/cwlinks/norm.daily.nao.cdas.z500.19500101_current.csv",
@@ -223,6 +228,10 @@ def main():
         print("WARNING: forecast unavailable; the website will fetch directly upon opening.")
         result["errors"]["forecast"] = result["errors"].get("forecast","No usable daily forecast")
         result["forecast"] = None
+    result = merge_sources(result, ROOT / "data" / "last_good.json", now)
+    print("DATA QUALITY", json.dumps(result["data_quality"],ensure_ascii=False))
+    for source, status in result["source_status"].items():
+        print("SOURCE", source, status["state"], status.get("retrieved_at"))
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(json.dumps(result,ensure_ascii=False,separators=(",",":")),encoding="utf-8")
     print("Published data snapshot for", now.isoformat(), "size", OUT.stat().st_size)
