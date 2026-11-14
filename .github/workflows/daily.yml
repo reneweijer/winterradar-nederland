@@ -9,6 +9,7 @@ on:
 
 permissions:
   contents: read
+  actions: read
   pages: write
   id-token: write
 
@@ -32,10 +33,37 @@ jobs:
           python-version: '3.12'
       - name: Controleer Python en dashboardlogica
         run: |
-          python -m py_compile scripts/update.py scripts/winter_v2.py
+          python -m py_compile scripts/update.py scripts/winter_v2.py scripts/data_quality.py
+          PYTHONPATH=scripts python scripts/test_data_quality.py
           node --check assets/winter-v2.js
+      - name: Herstel vorige geldige brongegevens uit cache
+        id: restore-weather-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: data/last_good.json
+          key: winterradar-sources-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            winterradar-sources-
+      - name: Herstel eerste geldige brongegevens uit eerdere geslaagde run
+        if: ${{ hashFiles('data/last_good.json') == '' }}
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p data /tmp/winterradar-seed
+          if gh run download 43571975955 --name github-pages --dir /tmp/winterradar-seed; then
+            if test -s /tmp/winterradar-seed/artifact.tar; then
+              tar -xOf /tmp/winterradar-seed/artifact.tar ./data/latest.json > data/last_good.json || true
+              python -c 'import json,pathlib; p=pathlib.Path("data/last_good.json"); json.loads(p.read_text()) if p.exists() and p.stat().st_size else None'
+            fi
+          fi
       - name: Weergegevens en NAO/AO ophalen
         run: python scripts/update.py
+      - name: Bewaar geldige brongegevens voor volgende run
+        uses: actions/cache/save@v4
+        with:
+          path: data/last_good.json
+          key: winterradar-sources-${{ github.run_id }}-${{ github.run_attempt }}
       - name: Websitebestanden samenstellen
         shell: bash
         run: |
@@ -59,3 +87,21 @@ jobs:
       - name: Website publiceren
         id: deployment
         uses: actions/deploy-pages@v4
+      - name: Datakwaliteit controleren
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json,sys
+          data=json.load(open('data/latest.json'))
+          quality=data.get('data_quality',{})
+          print('DATA QUALITY:',quality)
+          if quality.get('state')!='complete':
+              print('::warning::Niet alle modelbronnen zijn actueel; controleer de bronstatus in het dashboard.')
+          source=(data.get('source_status') or {})
+          if source.get('forecast',{}).get('state')=='missing':
+              print('::error::De 14-daagse weersverwachting ontbreekt. Pagina is gepubliceerd met foutmelding.')
+              sys.exit(1)
+          if quality.get('fresh_count',0)==0:
+              print('::error::Geen enkele modelbron is in deze run vernieuwd.')
+              sys.exit(1)
+          PY
