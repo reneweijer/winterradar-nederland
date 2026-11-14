@@ -30,6 +30,10 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Controleer Python en dashboardlogica
+        run: |
+          python -m py_compile scripts/update.py scripts/winter_v2.py
+          node --check assets/winter-v2.js
       - name: Weergegevens en NAO/AO ophalen
         run: python scripts/update.py
       - name: Websitebestanden samenstellen
@@ -38,6 +42,7 @@ jobs:
           mkdir -p dist/data
           cp index.html dist/index.html
           cp data/latest.json dist/data/latest.json
+          cp -R assets dist/assets
           touch dist/.nojekyll
       - name: GitHub Pages configureren
         uses: actions/configure-pages@v5
