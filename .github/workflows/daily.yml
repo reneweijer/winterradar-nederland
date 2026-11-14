@@ -43,6 +43,10 @@ jobs:
           cp index.html dist/index.html
           cp data/latest.json dist/data/latest.json
           cp -R assets dist/assets
+          # Pin the NASA/SDO archival photograph to GitHub Pages to avoid
+          # cross-origin image blocking in mobile browsers. The page has a
+          # remote fallback if the NASA download is temporarily unavailable.
+          curl --fail --silent --show-error --location --retry 2 --connect-timeout 10 --max-time 35 "https://svs.gsfc.nasa.gov/vis/a000000/a003900/a003983/SDOAIA304A_Jewelbox.01000.jpg" -o dist/assets/sun-nasa-304.jpg || echo "NASA solar photograph unavailable: remote fallback remains active"
           touch dist/.nojekyll
       - name: GitHub Pages configureren
         uses: actions/configure-pages@v5
