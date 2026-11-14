@@ -6,6 +6,7 @@ locate a blocking high or jet stream with scientific precision.
 """
 import datetime as dt
 import math
+from concurrent.futures import ThreadPoolExecutor
 
 SITES = [
     ("Azoren", 37.75, -25.67),
@@ -44,31 +45,37 @@ def regional_forecast(api):
     groups = [SITES[:5], SITES[5:9], SITES[9:]]
     results = []
     failures = []
-    for group in groups:
-        p = dict(
+
+    def fetch_group(group):
+        params = dict(
             latitude=",".join(str(x[1]) for x in group),
             longitude=",".join(str(x[2]) for x in group),
             hourly=",".join(VARIABLES.keys()),
             models="gfs_seamless", forecast_days=3, timezone="UTC",
         )
+        trouble = None
         try:
-            raw = api("https://api.open-meteo.com/v1/forecast", p)
+            raw = api("https://api.open-meteo.com/v1/forecast", params)
         except Exception as exc:
-            print("Regional model group failed:", group[0][0], str(exc)[:150])
-            failures.append(group[0][0])
-            # Preserve pressure, surface wind and thermal advection if
-            # the optional 250 hPa field is temporarily unavailable.
-            p["hourly"] = "pressure_msl,wind_speed_10m,wind_direction_10m,temperature_850hPa"
+            trouble = group[0][0]
+            print("Regional upper-level batch failed:", trouble, str(exc)[:150])
+            params["hourly"] = "pressure_msl,wind_speed_10m,wind_direction_10m,temperature_850hPa"
             try:
-                raw = api("https://api.open-meteo.com/v1/forecast", p)
+                raw = api("https://api.open-meteo.com/v1/forecast", params)
             except Exception as second:
-                print("Regional fallback also failed:",str(second)[:150])
-                continue
+                print("Regional fallback batch failed:", trouble, str(second)[:150])
+                return [], [trouble]
         samples = raw if isinstance(raw,list) else [raw]
         if len(samples) != len(group):
-            print("Regional model group returned incomplete location array")
-            continue
-        results.extend(zip(group,samples))
+            return [], [group[0][0]]
+        return list(zip(group,samples)), ([trouble] if trouble else [])
+
+    # Independent requests in parallel: a slow model group no longer stalls
+    # every other group sequentially.
+    with ThreadPoolExecutor(max_workers=3) as pool:
+        for group_data, group_failures in pool.map(fetch_group,groups):
+            results.extend(group_data)
+            failures.extend(group_failures)
     if len(results) < 3:
         raise RuntimeError("Fewer than 3 usable model locations after partial retries")
 
