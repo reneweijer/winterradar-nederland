@@ -135,6 +135,11 @@ def previous_snapshot(download):
                 "temperature_2m_max":daily.get("temperature_2m_max",[]),
                 "wind_direction_10m_dominant":daily.get("wind_direction_10m_dominant",[]),
             }),
+            ensemble=previous.get("ensemble"),
+            snow=previous.get("snow"),
+            europe=previous.get("europe"),
+            outlook=previous.get("outlook"),
+            source_status=previous.get("source_status"),
             indices={k:dict(date=v.get("date"),value=v.get("value"))
                      for k,v in (previous.get("indices") or {}).items()
                      if isinstance(v,dict)},
