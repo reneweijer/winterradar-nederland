@@ -1,10 +1,6 @@
 name: Winterradar — website direct publiceren
 
 on:
-  push:
-    paths:
-      - '.github/workflows/publish.yml'
-      - 'index.html'
   workflow_dispatch:
 
 permissions:
