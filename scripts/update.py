@@ -48,12 +48,8 @@ def forecast():
         daily="temperature_2m_min,temperature_2m_max,wind_direction_10m_dominant,snowfall_sum",
         timezone="Europe/Amsterdam", forecast_days=14
     )
-    try:
-        return api("https://api.open-meteo.com/v1/forecast", params)
-    except Exception as ex:
-        print("250 hPa forecast unavailable; retrying without high-altitude wind:", ex)
-        params.pop("hourly")
-        return api("https://api.open-meteo.com/v1/forecast", params)
+    return api("https://api.open-meteo.com/v1/forecast", params)
+
 
 def read_daily_index(url, name):
     """Read NOAA's daily-updated CDAS CSV; ignore all missing/future values."""
@@ -71,13 +67,18 @@ def read_daily_index(url, name):
             if key is None:
                 key = next((k for k in row if k and ("index" in k.lower() or "value" in k.lower())), None)
             raw_value = row.get(key, "") if key else ""
-            raw_date = next((str(v) for k,v in row.items() if k and (k.lower().strip() in ("time","date","datetime","day") or k.lower().strip().startswith("time"))), "")
-            if not raw_date:
-                raw_date = str(next(iter(row.values()), ""))
-            match = re.search(r"(?:19|20)\d{2}[-/](?:0?[1-9]|1[012])[-/](?:0?[1-9]|[12]\d|3[01])", raw_date)
-            if not match:
-                continue
-            date = dt.date.fromisoformat(match.group(0).replace("/", "-"))
+            if all(k in row for k in ("year","month","day")):
+                try:
+                    date = dt.date(int(row["year"]),int(row["month"]),int(row["day"]))
+                except (TypeError,ValueError):
+                    continue
+            else:
+                raw_date = next((str(v) for k,v in row.items()
+                         if k and k.lower().strip() in ("time","date","datetime")), "")
+                match = re.search(r"(?:19|20)\d{2}[-/](?:0?[1-9]|1[012])[-/](?:0?[1-9]|[12]\d|3[01])", raw_date)
+                if not match:
+                    continue
+                date = dt.date.fromisoformat(match.group(0).replace("/", "-"))
             try:
                 value = float(str(raw_value).strip())
             except (ValueError, TypeError):
@@ -216,7 +217,9 @@ def main():
           result["indices"]["scand"].get("error",""))
 
     if not isinstance(result["forecast"], dict) or not result["forecast"].get("daily", {}).get("time"):
-        raise SystemExit("Daily forecast missing: retaining previous deployed site")
+        print("WARNING: forecast unavailable; the website will fetch directly upon opening.")
+        result["errors"]["forecast"] = result["errors"].get("forecast","No usable daily forecast")
+        result["forecast"] = None
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(json.dumps(result,ensure_ascii=False,separators=(",",":")),encoding="utf-8")
     print("Published data snapshot for", now.isoformat(), "size", OUT.stat().st_size)
