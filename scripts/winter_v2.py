@@ -38,52 +38,73 @@ def finite_or_none(value, digits=1):
 
 
 def regional_forecast(api):
-    p = dict(
-        latitude=",".join(str(x[1]) for x in SITES),
-        longitude=",".join(str(x[2]) for x in SITES),
-        hourly=",".join(VARIABLES.keys()),
-        models="gfs_seamless",
-        forecast_days=4,
-        timezone="UTC",
-    )
-    raw = api("https://api.open-meteo.com/v1/forecast", p)
-    datasets = raw if isinstance(raw, list) else [raw]
-    if len(datasets) != len(SITES):
-        raise RuntimeError(f"Expected {len(SITES)} regional locations, got {len(datasets)}")
-
-    times = (datasets[0].get("hourly") or {}).get("time") or []
-    if len(times) < 25:
-        raise RuntimeError("Regional hourly forecast times are unavailable")
-    now = dt.datetime.now(dt.timezone.utc).replace(tzinfo=None)
-    frame_hours = (6, 24, 48)
-    frames = []
-    for lead in frame_hours:
-        target = now + dt.timedelta(hours=lead)
-        index = next(
-            (i for i, stamp in enumerate(times)
-             if dt.datetime.fromisoformat(stamp.replace("Z", "+00:00")).replace(tzinfo=None) >= target),
-            len(times) - 1,
+    """Retrieve independent groups; return partial, *labeled* model points on failure."""
+    # Using smaller requests prevents one slow or unavailable point from
+    # making the entire European view disappear.
+    groups = [SITES[:5], SITES[5:9], SITES[9:]]
+    results = []
+    failures = []
+    for group in groups:
+        p = dict(
+            latitude=",".join(str(x[1]) for x in group),
+            longitude=",".join(str(x[2]) for x in group),
+            hourly=",".join(VARIABLES.keys()),
+            models="gfs_seamless", forecast_days=3, timezone="UTC",
         )
+        try:
+            raw = api("https://api.open-meteo.com/v1/forecast", p)
+        except Exception as exc:
+            print("Regional model group failed:", group[0][0], str(exc)[:150])
+            failures.append(group[0][0])
+            # Preserve pressure, surface wind and thermal advection if
+            # the optional 250 hPa field is temporarily unavailable.
+            p["hourly"] = "pressure_msl,wind_speed_10m,wind_direction_10m,temperature_850hPa"
+            try:
+                raw = api("https://api.open-meteo.com/v1/forecast", p)
+            except Exception as second:
+                print("Regional fallback also failed:",str(second)[:150])
+                continue
+        samples = raw if isinstance(raw,list) else [raw]
+        if len(samples) != len(group):
+            print("Regional model group returned incomplete location array")
+            continue
+        results.extend(zip(group,samples))
+    if len(results) < 3:
+        raise RuntimeError("Fewer than 3 usable model locations after partial retries")
+
+    now = dt.datetime.now(dt.timezone.utc).replace(tzinfo=None)
+    frames = []
+    for lead in (6,24,48):
+        target=now+dt.timedelta(hours=lead)
         spots = []
-        for site, data in zip(SITES, datasets):
+        valid_for = None
+        for site, data in results:
             hourly = data.get("hourly") or {}
-            spot = dict(name=site[0], lat=site[1], lon=site[2])
-            for api_key, out_key in VARIABLES.items():
-                seq = hourly.get(api_key) or []
-                val = seq[index] if index < len(seq) else None
-                spot[out_key] = finite_or_none(val)
+            times = hourly.get("time") or []
+            if not times:
+                continue
+            index = next(
+                (i for i, stamp in enumerate(times)
+                 if dt.datetime.fromisoformat(stamp.replace("Z","+00:00")).replace(tzinfo=None)>=target),
+                len(times)-1,
+            )
+            valid_for = times[index]+"Z"
+            spot = dict(name=site[0],lat=site[1],lon=site[2])
+            for api_key,out_key in VARIABLES.items():
+                seq=hourly.get(api_key) or []
+                value=seq[index] if index<len(seq) else None
+                spot[out_key]=finite_or_none(value)
             spots.append(spot)
-        frames.append(dict(
-            lead_hours=lead,
-            valid_for=times[index] + "Z",
-            points=spots,
-        ))
+        frames.append(dict(lead_hours=lead,valid_for=valid_for,points=spots))
     return dict(
         model="Open-Meteo GFS seamless",
         kind="forecast_model_points",
         generated_at=dt.datetime.now(dt.timezone.utc).isoformat(),
         frames=frames,
-        note="Slechts 13 modelpunten. Geen doorlopende isobaren, geen exacte jetstreamligging.",
+        locations_expected=len(SITES),
+        locations_available=len(results),
+        failures=failures,
+        note="Onvolledige modelpunten mogelijk; geen continue isobaren of exacte jetstreamligging.",
     )
 
 
