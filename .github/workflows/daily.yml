@@ -45,6 +45,8 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           path: dist
+      - name: Wacht tot GitHub de websitebestanden heeft geregistreerd
+        run: sleep 10
       - name: Website publiceren
         id: deployment
         uses: actions/deploy-pages@v4
