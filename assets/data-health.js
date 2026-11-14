@@ -7,6 +7,7 @@ const models = [
   ["ensemble","Ensembleberekeningen nachtvorst"],
   ["snow","Sneeuwmodelpunten Oost-Europa"],
   ["europe","Europese atmosfeerkaart"],
+  ["outlook","GFS koudeaanvoer en luchtdruk · 14 dagen"],
   ["upper_air","Straalstroomindicatie op 250 hPa"],
   ["vortex","Poolwervelindicatie op 10 hPa"]
 ];
