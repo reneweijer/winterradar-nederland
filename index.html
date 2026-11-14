@@ -39,6 +39,23 @@
 
 @media(max-width:830px){.homepage .cosmos-hero>.cosmos-photo{height:225px;object-fit:fill;object-position:center top}.homepage .cosmos-data{padding-top:235px}}
 @media(max-width:520px){.homepage .cosmos-hero>.cosmos-photo{height:153px;object-fit:fill;object-position:center top}.homepage .cosmos-data{padding-top:165px}.homepage .cosmos-shade{background:linear-gradient(to bottom,rgba(4,15,28,0) 0,rgba(4,15,28,0) 105px,rgba(5,18,32,.97) 160px,#061526 230px)}}
+
+/* Leesbare ensemble-weergave: echte percentages per dag in plaats van misleidende y-as */
+.ensemble-display{width:100%;height:auto!important;min-height:0!important;color:#edf8fe}
+.ensemble-summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:8px 0 16px}
+.ensemble-summary>div{padding:13px 16px;border-radius:12px;background:#122c44;border:1px solid #244861;display:flex;align-items:baseline;flex-wrap:wrap;gap:7px}
+.ensemble-eyebrow{display:block;flex-basis:100%;color:#a7bdca;font-size:11px;letter-spacing:.06em;font-weight:700}
+.ensemble-summary strong{font-size:25px;color:#80dfb4;font-family:Manrope,sans-serif}
+.ensemble-summary small{font-size:13px;color:#afd0dc}
+.ensemble-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 12px}
+.ensemble-item{display:grid;grid-template-columns:62px minmax(0,1fr) 49px;grid-template-rows:auto auto;gap:3px 8px;align-items:center;background:#10263b;border:1px solid #29465c;border-radius:9px;padding:9px 10px;min-width:0}
+.ensemble-date{font-size:13px;color:#bdd6e1;grid-row:1 / 3}
+.ensemble-track{height:10px;background:#29445a;border-radius:99px;overflow:hidden;grid-column:2;grid-row:1}
+.ensemble-fill{height:100%;display:block;background:linear-gradient(90deg,#58bba0,#89efd0);border-radius:99px;min-width:0}
+.ensemble-value{font-size:18px;color:#8ce9c0;text-align:right;grid-row:1 / 3;grid-column:3}
+.ensemble-count{font-size:11px;color:#93b3c4;white-space:nowrap;grid-row:2;grid-column:2}
+.ensemble-footnote{margin:14px 0 0;color:#a8c2d3;font-size:13px;line-height:1.55}
+@media(max-width:760px){.ensemble-grid{grid-template-columns:1fr}.ensemble-item{grid-template-columns:70px minmax(0,1fr) 48px}}
 </style></head><body><main class="wrap"><header><div class="brand"><span class="brandicon">❄</span><div>WINTER<span style="color:#7bdafa">RADAR</span><div class="mini">NEDERLAND · DATAGEDREVEN</div></div></div><div class="topbuttons"><span class="tag">Onderzoeksdashboard</span><select class="select" id="location" aria-label="Locatie voor winterverwachting"><option value="debilt">De Bilt</option><option value="maarssen">Maarssen</option></select><button id="refresh" class="button" onclick="loadAll(true)">↻ Vernieuwen</button></div></header><nav class="tabs"><button class="tab active" data-tab="vandaag">Home</button><button class="tab" data-tab="verwachting">14 dagen</button><button class="tab" data-tab="atmosfeer">Atmosfeer</button><button class="tab" data-tab="historie">Historisch</button><button class="tab" data-tab="bronnen">Bronnen</button></nav>
 <section id="vandaag" class="page homepage">
 <div class="cosmos-hero" aria-label="Aarde en zon met actuele astronomische gegevens">
@@ -66,7 +83,7 @@
 <div class="home-dashboard-grid">
  <div class="home-graphs">
   <div class="home-panel"><div class="home-panel-head"><span class="home-icon">▤</span><div><h2>Komende 14 dagen</h2><p>Minimum- en maximumtemperatuur · weermodel</p></div></div><div class="home-chart-box"><div class="home-chart-label">Temperatuur (°C)</div><div id="tempChart" class="empty">Actuele verwachting wordt geladen…</div><div class="legend"><span><i class="key" style="background:#56c6f4"></i>Minimum</span><span><i class="key" style="background:#f5bd84"></i>Maximum</span></div></div>
-  <div class="home-chart-box"><div class="home-chart-label">Vorstkans · aandeel ensembleleden</div><div id="probChart" class="empty">Ensemblegegevens worden geladen…</div><div class="mini">Aandeel modelleden met Tmin &lt; 0 °C, geen gekalibreerde kans.</div></div></div>
+  <div class="home-chart-box"><div class="home-chart-label">Nachtvorst per dag · wat zeggen de weermodellen?</div><div id="probChart" class="empty">Ensemblegegevens worden geladen…</div><div class="mini">Voorbeeld: 20% betekent dat 20 van elke 100 modelberekeningen nachtvorst verwachten. Dit is <strong>geen</strong> exact berekende kans of betrouwbare seizoensvoorspelling.</div></div></div>
  </div>
  <div class="home-rail">
   <div class="home-panel"><div class="home-panel-head"><span class="home-icon">⌁</span><div><h2>Winterindicatoren</h2><p>Huidige atmosfeer · bronstatus</p></div></div>
@@ -225,7 +242,35 @@ const enoughData=first7.filter(Number.isFinite).length>=5&&firstMax.filter(Numbe
 const lab=t.map(dateNL);drawLines($('tempChart'),[{values:mins,color:'#56c6f4'},{values:maxs,color:'#f5bd84'}],lab);$('daysTable').innerHTML=t.map((day,i)=>'<tr><td>'+dateNL(day)+'</td><td>'+fmt(mins[i])+' °C</td><td>'+fmt(maxs[i])+' °C</td><td>'+dirName(dirs[i])+' ('+Math.round(dirs[i]||0)+'°)</td><td>'+(mins[i]<0?'❄ Ja':'Nee')+'</td><td>'+(maxs[i]<0?'❄ Ja':'Nee')+'</td><td>'+fmt(snow[i])+' cm</td></tr>').join('');
 }
 function dirName(a){if(!Number.isFinite(a))return '—';return ['N','NO','O','ZO','Z','ZW','W','NW'][Math.round(a/45)%8]}
-function renderEns(o){if(!o?.daily){$('probChart').innerHTML='<div class="empty">Geen ensemblegegevens beschikbaar — we tonen geen verzonnen vorstkansen.</div>';return}const d=o.daily,k=Object.keys(d).filter(x=>/^temperature_2m_min_member/.test(x));if(k.length<5){$('probChart').innerHTML='<div class="empty">Onvoldoende ensembleleden ('+k.length+'). Geen betrouwbaar ensemblepercentage beschikbaar.</div>';return}const dates=d.time||[],p=dates.map((_,i)=>{let v=k.map(x=>d[x]?.[i]).filter(Number.isFinite);return v.length>=5?100*v.filter(x=>x<0).length/v.length:null});drawLines($('probChart'),[{values:p,color:'#84e7bd'}],dates.map(dateNL),0,100);}
+function renderEns(o){
+ const target=$('probChart');
+ if(!o?.daily){target.innerHTML='<div class="empty">De modelberekeningen voor nachtvorst zijn tijdelijk niet beschikbaar.</div>';return;}
+ const d=o.daily, keys=Object.keys(d).filter(k=>/^temperature_2m_min_member/.test(k));
+ if(keys.length<5){target.innerHTML='<div class="empty">Te weinig modelleden voor een bruikbare vergelijking ('+keys.length+').</div>';return;}
+ const dates=d.time||[];
+ const data=dates.map((date,i)=>{
+  const values=keys.map(k=>d[k]?.[i]).filter(Number.isFinite);
+  if(values.length<5)return {date,valid:false};
+  const frost=values.filter(x=>x<0).length;
+  return {date,valid:true,count:values.length,frost,percent:Math.round(100*frost/values.length)};
+ });
+ const valid=data.filter(x=>x.valid);
+ if(!valid.length){target.innerHTML='<div class="empty">Nog geen bruikbare modelpercentages per dag beschikbaar.</div>';return;}
+ const max=valid.reduce((a,b)=>a.percent>=b.percent?a:b);
+ const first=valid[0];
+ const summary='<div class="ensemble-summary"><div><span class="ensemble-eyebrow">EERSTE VOORSPELDAG</span><strong>'+first.percent+'%</strong><small>'+dateNL(first.date)+'</small></div><div><span class="ensemble-eyebrow">HOOGSTE AANDEEL</span><strong>'+max.percent+'%</strong><small>'+dateNL(max.date)+'</small></div></div>';
+ const rows=data.map(item=>{
+  const dlabel=dateNL(item.date);
+  if(!item.valid)return '<div class="ensemble-item"><span class="ensemble-date">'+dlabel+'</span><div class="ensemble-track"></div><strong class="ensemble-value">—</strong></div>';
+  return '<div class="ensemble-item" title="'+item.frost+' van '+item.count+' modelleden verwachten Tmin onder nul op '+dlabel+'">'
+    +'<span class="ensemble-date">'+dlabel+'</span>'
+    +'<div class="ensemble-track"><span class="ensemble-fill" style="width:'+item.percent+'%"></span></div>'
+    +'<strong class="ensemble-value">'+item.percent+'%</strong>'
+    +'<span class="ensemble-count">'+item.frost+'/'+item.count+' leden</span></div>';
+ }).join('');
+ target.className='ensemble-display';
+ target.innerHTML=summary+'<div class="ensemble-grid">'+rows+'</div><p class="ensemble-footnote">Een balk van 20% betekent dat 1 op de 5 berekeningen vorst voorspelt. Niet hetzelfde als een 20% gegarandeerde kans op vorst.</p>';
+}
 function renderSnow(a){if(!a){$('snowRegion').innerHTML='<div class="empty">De modelmatige sneeuwdiepte kon niet worden geladen.</div>';return}const rs=Array.isArray(a)?a:[a];$('snowRegion').innerHTML=points.map((p,i)=>{const item=rs[i]||{},ts=item.hourly?.time||[],sd=item.hourly?.snow_depth||[],tt=item.hourly?.temperature_2m||[];let idx=Math.max(0,ts.findIndex(z=>Date.parse(z+'Z')>=Date.now()));if(idx===0&&ts.length>1){idx=0}const depth=Number.isFinite(sd[idx])?fmt(sd[idx]*100)+' cm':'Niet beschikbaar',temp=Number.isFinite(tt[idx])?fmt(tt[idx])+' °C':'—';return '<div class="card"><div class="cardtitle">'+p[0]+'</div><div class="big">'+depth+'</div><div class="soft">Modelmatige sneeuwdiepte · temp '+temp+'</div></div>'}).join('');}
 function renderAnnual(){const selection=$('annualType');if(!selection)return;const field=selection.value;const rows=HIST.annual_series.filter(r=>Number.isFinite(r[field]));const labels=rows.map(r=>String(r.year));const vals=rows.map(r=>r[field]);$('annualTitle').textContent=selection.options[selection.selectedIndex].textContent.toUpperCase();drawLines($('annualChart'),[{values:vals,color:'#68d2f2'}],labels)}
 function renderHistorical(){const w=HIST.winter_series;function correlation(x,y){let n=x.length,sx=0,sy=0,sxy=0,sx2=0,sy2=0;x.forEach((v,i)=>{sx+=v;sy+=y[i];sxy+=v*y[i];sx2+=v*v;sy2+=y[i]*y[i]});return (n*sxy-sx*sy)/Math.sqrt((n*sx2-sx*sx)*(n*sy2-sy*sy))}const c=correlation(w.map(o=>o.nao),w.map(o=>o.temperature_c));$('correlation').textContent=fmt(c);
