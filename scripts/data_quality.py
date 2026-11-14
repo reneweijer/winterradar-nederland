@@ -8,9 +8,9 @@ import json
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
-SOURCE_NAMES = ("forecast", "ensemble", "snow", "europe", "upper_air", "vortex")
+SOURCE_NAMES = ("forecast", "ensemble", "snow", "europe", "outlook", "upper_air", "vortex")
 TTL_HOURS = {"forecast": 18, "ensemble": 18, "snow": 18,
-             "europe": 18, "upper_air": 18, "vortex": 18}
+             "europe": 18, "outlook": 18, "upper_air": 18, "vortex": 18}
 LOCAL_ZONE = ZoneInfo("Europe/Amsterdam")
 
 
@@ -41,6 +41,17 @@ def valid(source, value, now):
     if source == "europe":
         return (isinstance(value, dict)
                 and any(len(f.get("points", [])) >= 3 for f in value.get("frames", [])))
+    if source == "outlook":
+        if not isinstance(value, dict):
+            return False
+        windows=value.get("windows") or {}
+        near=windows.get("near") or {}
+        later=windows.get("later") or {}
+        today=now.astimezone(LOCAL_ZONE).date()
+        return (near.get("start") == today.isoformat()
+                and later.get("start") == (today+dt.timedelta(days=7)).isoformat()
+                and any(isinstance(w.get("t850_c"),(int,float)) or isinstance(w.get("scandi_minus_london_hpa"),(int,float))
+                        for w in (near,later)))
     if source == "snow":
         return (isinstance(value, list) and len(value) >= 3)
     if source == "upper_air":
