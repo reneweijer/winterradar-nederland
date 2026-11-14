@@ -19,3 +19,22 @@
 .health-stamp{font-size:11px;color:#95b4c7;line-height:1.5;margin-top:8px}
 .health-partial{border-color:#94744a!important;color:#ffcd8d!important}
 @media(max-width:560px){.health-panel{padding:13px}.health-rowtop{align-items:flex-start}.health-table td{font-size:11px;padding:10px 3px}.health-table td:first-child{max-width:125px}.health-table td:last-child{max-width:190px}}
+
+/* Historical cold-winter pattern audit */
+.bt-audit{background:linear-gradient(135deg,#10273d,#091e31);border:1px solid #35617c;border-radius:19px;padding:20px;margin:18px 0 24px}
+.bt-intro strong{font-size:17px;color:#e9f8ff}
+.bt-intro p{margin:8px 0 17px;color:#abc4d4;font-size:13px;line-height:1.6}
+.bt-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:0 0 17px}
+.bt-stats>div{padding:13px 12px;background:#102f47;border:1px solid #335773;border-radius:12px}
+.bt-stats span{display:block;color:#aac7da;font-size:11px;line-height:1.35}
+.bt-stats strong{display:block;margin-top:6px;font-size:24px;color:#f1fbff}
+.bt-table-wrap{overflow-x:auto}
+.bt-table{width:100%;border-collapse:collapse;color:#d7e9f5;font-size:13px;white-space:nowrap}
+.bt-table th,.bt-table td{text-align:left;padding:11px 9px;border-bottom:1px solid #28485f}
+.bt-table th{font-size:11px;color:#a4c2d7;text-transform:uppercase;letter-spacing:.04em}
+.bt-table strong{color:#92dfff}
+.bt-note{color:#adc6d7;font-size:12px;line-height:1.6;margin:15px 0}
+.bt-details{border-top:1px solid #2d536d;padding-top:11px}
+.bt-details summary{color:#bde4f4;cursor:pointer;font-size:13px}
+.bt-details p{color:#a8c4d8;font-size:12px;line-height:1.6}
+@media(max-width:700px){.bt-audit{padding:14px}.bt-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.bt-table{font-size:12px}.bt-stats strong{font-size:21px}}
