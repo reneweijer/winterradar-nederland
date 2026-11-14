@@ -16,6 +16,7 @@ import urllib.parse
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor
 from winter_v2 import regional_forecast, previous_snapshot
+from outlook import regional_outlook
 from data_quality import merge_sources
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
@@ -178,12 +179,13 @@ def main():
     ]
     result = dict(
         collected_at=now.isoformat(), forecast=None,
-        ensemble=None, snow=None, upper_air=None, vortex=None, europe=None, previous=None, indices={}, errors={}
+        ensemble=None, snow=None, upper_air=None, vortex=None, europe=None, outlook=None, previous=None, indices={}, errors={}
     )
     result["previous"] = previous_snapshot(download)
     operations = {
         "forecast": forecast,
         "europe": lambda: regional_forecast(api),
+        "outlook": lambda: regional_outlook(api),
         "ensemble": lambda: api(
             "https://ensemble-api.open-meteo.com/v1/ensemble",
             dict(latitude=52.101,longitude=5.18,
