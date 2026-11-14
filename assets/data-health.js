@@ -58,8 +58,8 @@ function render(ctx) {
  tbody.innerHTML=all.map(x=>'<tr><td>'+x.label+'</td><td><span class="health-mark '+x.state+'"></span>'+x.text+'</td></tr>').join("");
  if(id("healthStamp"))id("healthStamp").textContent=server+". Een succesvol gepubliceerde pagina betekent niet dat alle bronnen zijn vernieuwd.";
  if(id("updateStatus")) {
-   id("updateStatus").textContent=(missing?"⚠ Deels ontbrekende data":"✓ Bronnen beschikbaar")+" · "+working+"/"+all.length;
-   id("updateStatus").className="status "+(missing?"health-partial":"");
+   id("updateStatus").textContent=(missing?"⚠ Ontbrekende bronnen":cached?"⚠ "+cached+" modelbronnen uit reserve":"✓ Alle bronnen beschikbaar")+" · "+working+"/"+all.length;
+   id("updateStatus").className="status "+((missing||cached)?"health-partial":"");
  }
 }
 async function json(base,parameters,timeout=10500) {
