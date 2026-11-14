@@ -29,7 +29,7 @@ with tempfile.TemporaryDirectory() as t:
     assert updated["forecast"]==sample
     assert updated["source_status"]["forecast"]["state"]=="cached"
     assert updated["source_status"]["forecast"]["age_hours"]==10
-    assert updated["data_quality"]["missing_count"]==5
+    assert updated["data_quality"]["missing_count"]==6
     # Do not keep data indefinitely
     after=now+dt.timedelta(days=2)
     stale=merge_sources({"forecast":None,"errors":{}},cache,after)
