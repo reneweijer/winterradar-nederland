@@ -1,0 +1,46 @@
+/* KouRadar 3.0 — prominent, legible 0–7 and 8–14 day winter-signal instrument */
+.kr-panel{position:relative;overflow:hidden;margin:18px 0 17px;padding:22px 24px;border:1px solid #386787;border-radius:22px;background:radial-gradient(ellipse at 4% 3%,#193e58 0%,transparent 42%),linear-gradient(135deg,#102a42 0%,#081e31 65%,#09283e 100%);box-shadow:0 14px 38px #0004;color:#ecf7fc}
+.kr-panel:before{content:"";position:absolute;top:-110px;right:-95px;width:250px;height:250px;border-radius:50%;background:radial-gradient(circle,#3ca5d71c,transparent 65%);pointer-events:none}
+.kr-top{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;margin:0 0 14px}
+.kr-eyebrow{display:block;color:#80dafa;letter-spacing:.15em;font-size:11px;font-weight:800;text-transform:uppercase}
+.kr-top h2{font:800 clamp(21px,3vw,29px)/1.2 Manrope,sans-serif;margin:5px 0 5px;color:#f5fcff}
+.kr-top p{font-size:13px;line-height:1.5;color:#a5c7d8;margin:0}
+.kr-mode{display:flex;gap:6px;align-items:center;font-size:11px;padding:7px 10px;border:1px solid #426b82;background:#142f47;border-radius:999px;color:#aecbd8}
+.kr-mode b{display:inline-block;height:8px;width:8px;border-radius:50%;background:#9dc4d8}
+.kr-main{display:grid;grid-template-columns:minmax(190px,.9fr) minmax(0,1.4fr);gap:25px;align-items:center}
+.kr-dial{position:relative;max-width:350px;width:100%;margin:0 auto;text-align:center}
+.kr-dial svg{display:block;width:100%;height:auto}
+.kr-needle{fill:none;stroke-width:15;stroke-linecap:round}
+.kr-reading{position:absolute;top:45%;width:100%;text-align:center}
+.kr-reading strong{font:800 clamp(46px,6vw,72px)/1 Manrope,sans-serif;letter-spacing:-.05em;color:#fff}
+.kr-reading span{color:#91b8ce;font-size:17px;font-weight:700;padding-left:5px}
+.kr-caption{position:absolute;top:80%;left:0;right:0;text-align:center;color:#aac4d5;font-size:12px}
+.kr-dial-footer{display:flex;justify-content:space-between;gap:10px;color:#98bacd;font-size:11px;margin:-5px 24px 0}
+.kr-summary{display:grid;gap:11px}
+.kr-result{font-size:22px;line-height:1.25;font-weight:800;color:#e5faff;margin:0}
+.kr-interpret{font-size:14px;color:#bad3df;line-height:1.5;margin:0}
+.kr-tags{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.kr-tag{display:grid;align-content:start;gap:4px;background:#122f49;border:1px solid #355d78;border-radius:12px;padding:10px 11px}
+.kr-tag span{font-size:11px;color:#9dbed0}
+.kr-tag strong{font-size:14px;font-weight:800;color:#ecf9ff;overflow-wrap:anywhere}
+.kr-bands{border-top:1px solid #2e5069;margin-top:18px;padding-top:15px;display:grid;gap:11px}
+.kr-band{display:grid;grid-template-columns:minmax(115px,140px) minmax(0,1fr) 70px;align-items:center;gap:12px}
+.kr-band-name strong{display:block;font-size:14px;color:#ebf8fd}
+.kr-band-name span{display:block;margin-top:3px;font-size:11px;color:#a8c1d0}
+.kr-track{height:12px;overflow:hidden;border-radius:99px;background:#28475c;position:relative}
+.kr-fill{width:0;height:100%;border-radius:inherit;background:linear-gradient(90deg,#6ccbb5,#a9d69c,#f2c777);transition:width .4s ease}
+.kr-band-value{text-align:right;font-weight:800;color:#e6f7fb;font-size:20px}
+.kr-band-value span{font-size:11px;color:#a5bfcd;font-weight:600}
+.kr-footnote{font-size:12px;line-height:1.55;color:#a0bed0;margin:12px 0 0}
+.kr-detail{border-top:1px solid #2d5066;margin-top:14px;padding-top:12px}
+.kr-detail summary{cursor:pointer;color:#b5e6f6;font-size:13px;font-weight:700;list-style-position:inside}
+.kr-breakdown{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:14px 0}
+.kr-subgroup{border:1px solid #294960;border-radius:11px;padding:12px;background:#0d253a}
+.kr-subgroup h3{font-size:14px;margin:0 0 10px;color:#d7f3ff}
+.kr-factor{display:flex;justify-content:space-between;gap:10px;margin:0;padding:7px 0;border-bottom:1px solid #26445a;font-size:12px;color:#b1ccda}
+.kr-factor:last-child{border:none}
+.kr-factor strong{color:#f1fbff;white-space:nowrap;font-size:12px}
+.kr-method{font-size:12px;line-height:1.65;color:#a7c8d8;margin:0}
+.kr-method strong{color:#dbeaf2}
+@media(max-width:840px){.kr-main{grid-template-columns:minmax(165px,.8fr) minmax(0,1.2fr);gap:14px}.kr-panel{padding:20px}.kr-reading{top:43%}.kr-tags{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}}
+@media(max-width:590px){.kr-panel{padding:16px;margin:13px 0}.kr-main{grid-template-columns:1fr;gap:6px}.kr-dial{max-width:270px}.kr-dial-footer{margin-top:-8px}.kr-result{text-align:center;font-size:19px}.kr-interpret{text-align:center}.kr-reading strong{font-size:58px}.kr-tags{gap:7px}.kr-tag{padding:9px 6px;text-align:center}.kr-tag span{font-size:10px}.kr-tag strong{font-size:12px}.kr-band{grid-template-columns:96px minmax(0,1fr) 58px;gap:8px}.kr-band-value{font-size:17px}.kr-breakdown{grid-template-columns:1fr}.kr-top h2{font-size:23px}}
