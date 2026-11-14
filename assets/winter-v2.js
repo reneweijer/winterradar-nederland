@@ -54,9 +54,11 @@ function analysisInputs(forecast,ens,east,indices,snapshot){
  const ensDays=getEnsemble(ens),snow=getSnow(east);
  const region=snapshot?.europe?.frames?.[0]?.points;
  const sourcePoints=["Berlijn","Warschau","Minsk"].map(name=>getRegionalPoint(region,name)).filter(Boolean);
- const t850=mean(sourcePoints.map(p=>p?.t850_c));
+ const temps850=sourcePoints.map(p=>p?.t850_c).filter(Number.isFinite);
+ const t850=temps850.length>=2?mean(temps850):null;
  const snowCoverage=snow?snow.filter(n=>n>=0.01).length:null;
- const pressureScand=mean(["Oslo","Stockholm","Helsinki"].map(x=>getRegionalPoint(region,x)?.pressure_hpa));
+ const scandPressures=["Oslo","Stockholm","Helsinki"].map(x=>getRegionalPoint(region,x)?.pressure_hpa).filter(Number.isFinite);
+ const pressureScand=scandPressures.length>=2?mean(scandPressures):null;
  const pressureLondon=getRegionalPoint(region,"Londen")?.pressure_hpa;
  const pressureDiff=Number.isFinite(pressureScand)&&Number.isFinite(pressureLondon)?pressureScand-pressureLondon:null;
  const nao=indices?.nao,ao=indices?.ao;
@@ -69,7 +71,7 @@ function computeSignal(a){
  if(!a.ok)return {value:null,coverage:0,note:"Onvoldoende 7-daagse temperatuurinformatie"};
  const components=[
   {name:"Lokale minimumtemperatuur",w:25,v:Math.min(25,18*a.frost/7+7*a.ice/7)},
-  {name:"Ensemblemodel",w:15,v:a.ensDays?Math.min(15,15*mean(a.ensDays.slice(0,7).filter(Boolean).map(x=>x.fraction))):null},
+  {name:"Ensemblemodel",w:15,v:a.ensDays?.slice(0,7).filter(Boolean).length>=5?Math.min(15,15*mean(a.ensDays.slice(0,7).filter(Boolean).map(x=>x.fraction))):null},
   {name:"Aanhoudende oostenwind",w:20,v:Math.min(20,12*a.longest/5+8*a.easterlies/7)},
   {name:"Koude lucht boven brongebied",w:20,v:Number.isFinite(a.t850)?(a.t850<=-7?20:a.t850<=-4?15:a.t850<=-1?9:a.t850<=2?4:0):null},
   {name:"Sneeuw in brongebied",w:5,v:a.snowCoverage!==null?5*a.snowCoverage/a.snow.length:null},
@@ -174,11 +176,18 @@ function mapColor(key,value) {
 }
 function renderMap() {
  const dest=e("v2Map");if(!dest)return;
- const snap=lastSnapshot?.europe,frameNum=Number(e("v2MapTime")?.value||0);
- const frame=snap?.frames?.[frameNum],kind=e("v2MapLayer")?.value||"pressure_hpa";
+ const snap=lastSnapshot?.europe;
+ let frameNum=Number(e("v2MapTime")?.value||0);
+ let frame=snap?.frames?.[frameNum];
+ if(frame?.valid_for && Date.parse(frame.valid_for)<Date.now()-7200000){
+  const usable=snap?.frames?.findIndex(x=>x.valid_for&&Date.parse(x.valid_for)>=Date.now()-7200000);
+  if(usable>=0){frameNum=usable;frame=snap.frames[usable];if(e("v2MapTime"))e("v2MapTime").value=String(usable);}
+  else frame=null;
+ }
+ const kind=e("v2MapLayer")?.value||"pressure_hpa";
  const units={pressure_hpa:"hPa",wind10_kmh:"km/u",t850_c:"°C",jet250_kmh:"km/u"};
  const layerLabel={pressure_hpa:"luchtdruk op zeeniveau",wind10_kmh:"wind op 10 meter",t850_c:"temperatuur op 850 hPa",jet250_kmh:"wind op 250 hPa"};
- if(!frame?.points?.length){dest.innerHTML='<div style="padding:28px;color:#afc9d8">Nog geen Europese modelkaart beschikbaar. Deze wordt met de dagelijkse gegevensverzameling opgehaald.</div>';if(e("v2MapDetails"))e("v2MapDetails").textContent="Geen modelpunten ontvangen; geen kaartwaarden ingevuld.";return;}
+ if(!frame?.points?.length){dest.innerHTML='<div style="padding:28px;color:#afc9d8">Er is nog geen actuele Europese modelkaart beschikbaar. Controleer de bronstatus of vernieuw het dashboard.</div>';if(e("v2MapDetails"))e("v2MapDetails").textContent="Geen modelpunten ontvangen; geen kaartwaarden ingevuld.";return;}
  const pts=frame.points;
  const W=940,H=470,x=lon=>65+(lon+28)/68*800,y=lat=>43+(69-lat)/34*370;
  const bg='<rect x="0" y="0" width="'+W+'" height="'+H+'" rx="14" fill="#10283d"/>';
