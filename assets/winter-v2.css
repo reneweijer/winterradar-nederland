@@ -1,0 +1,42 @@
+/* Winterradar v2 — readable evidence panels and geographic model-point map */
+.v2-brief{margin:14px 0 20px;padding:20px;background:linear-gradient(135deg,#11334b,#0d243a);border:1px solid #38617b;border-radius:22px;box-shadow:0 8px 28px #020f1f40}
+.v2-head{display:flex;align-items:flex-start;justify-content:space-between;gap:15px;flex-wrap:wrap;margin-bottom:12px}
+.v2-head h2{margin:0 0 5px;font-size:22px;color:#f3fbff}
+.v2-head p{margin:0;color:#9fbdd0;font-size:13px}
+.v2-fresh{display:inline-block;padding:6px 10px;border-radius:50px;border:1px solid #44627a;background:#1a3c52;color:#b9d8e7;font-size:12px}
+.v2-horizons{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.v2-horizon{padding:13px;border-radius:14px;border:1px solid #32546c;background:#112b41;min-width:0}
+.v2-horizon label{display:block;color:#9db8c9;font-size:11px;text-transform:uppercase;letter-spacing:.07em;margin-bottom:7px}
+.v2-horizon strong{display:block;color:#e9f9fc;font-size:16px;margin-bottom:6px}
+.v2-horizon p{font-size:12px;color:#adc6d6;margin:0;line-height:1.45}
+.v2-narrative{margin:15px 0 14px;font-size:15px;line-height:1.6;color:#e0eef5}
+.v2-columns{display:grid;grid-template-columns:1.1fr .9fr;gap:13px}
+.v2-subpanel{background:#10283c;border:1px solid #2b4f67;border-radius:13px;padding:13px 15px;font-size:13px}
+.v2-subpanel strong{color:#d5eefc;font-size:13px}
+.v2-subpanel p{color:#abc5d5;margin:7px 0 0;line-height:1.5}
+.v2-evidence{margin:6px 0 0;padding-left:18px;color:#abcbdc;font-size:13px;line-height:1.6}
+.v2-evidence li{padding:1px 0}
+.v2-coverage{margin-top:10px;color:#a0bfce;font-size:12px;line-height:1.45}
+.v2-link{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;padding:13px 16px;margin:15px 0 20px;border:1px solid #2c4a61;border-radius:12px;background:#0f293e}
+.v2-link p{margin:0;color:#b2d4e5;font-size:13px}
+.v2-link button{border:1px solid #4984a2;border-radius:10px;background:#16445e;color:#e7f9fc;font-size:13px;padding:10px 13px;cursor:pointer}
+.v2-map-card{border:1px solid #355b72;border-radius:19px;background:#10283c;padding:17px;margin:15px 0 18px}
+.v2-map-head{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:14px;margin-bottom:12px}
+.v2-map-head h2{font-size:20px;margin:0 0 5px;color:#f1fbff}
+.v2-map-head p{color:#9cb9c9;font-size:13px;margin:0;max-width:650px;line-height:1.5}
+.v2-map-controls{display:flex;flex-wrap:wrap;align-items:end;gap:12px}
+.v2-map-controls label{display:block;color:#bad3e0;font-size:12px}
+.v2-map-controls select{display:block;margin-top:5px;min-width:140px;max-width:100%;border:1px solid #3f6a82;border-radius:9px;background:#15354d;color:#ecf8ff;padding:9px 11px;font-size:14px}
+.v2-map-canvas{width:100%;background:radial-gradient(ellipse at 48% 30%,#1c415a,#0a1c2f 75%);border:1px solid #30556e;border-radius:14px;overflow:hidden;min-height:260px}
+.v2-map-canvas svg{display:block;width:100%;height:auto;min-height:260px}
+.v2-map-caption{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:#a4c3d1;margin:12px 0 9px}
+.v2-map-details{padding:11px 13px;border-radius:11px;background:#0d2031;border:1px solid #26475b;color:#c7dfeb;font-size:13px;line-height:1.5}
+.v2-map-note{font-size:12px;color:#91afc1;margin:11px 0 0;line-height:1.5}
+.v2-map-pin{cursor:pointer;outline:none}
+.v2-map-pin:focus-visible circle{stroke:#fff;stroke-width:3}
+.v2-map-pin circle{transition:r .12s}
+.v2-map-pin:hover circle{r:20}
+.v2-map-tag{font-size:11px;paint-order:stroke;stroke:#102339;stroke-width:3;fill:#eaf9ff;font-weight:600;pointer-events:none}
+.v2-map-value{font-size:12px;font-weight:750;fill:#fff;pointer-events:none}
+@media(max-width:850px){.v2-horizons{grid-template-columns:1fr 1fr}.v2-horizons .v2-horizon:last-child{grid-column:1/-1}.v2-columns{grid-template-columns:1fr}}
+@media(max-width:530px){.v2-brief{padding:15px}.v2-horizons{grid-template-columns:1fr}.v2-horizons .v2-horizon:last-child{grid-column:auto}.v2-map-card{padding:12px}.v2-map-controls{width:100%}.v2-map-controls label{flex:1;min-width:130px}.v2-map-controls select{width:100%;min-width:0}.v2-map-head h2{font-size:18px}.v2-map-details{font-size:12px}}
