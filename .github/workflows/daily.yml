@@ -36,6 +36,7 @@ jobs:
           python -m py_compile scripts/update.py scripts/winter_v2.py scripts/data_quality.py scripts/outlook.py
           PYTHONPATH=scripts python scripts/test_data_quality.py
           PYTHONPATH=scripts python scripts/test_outlook.py
+          PYTHONPATH=scripts python scripts/test_previous.py
           node --check assets/winter-v2.js
           node --check assets/data-health.js
           node --check assets/historical-backtest.js
