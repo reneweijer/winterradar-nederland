@@ -39,4 +39,22 @@ const none=sandbox.window.KouRadar.compute({...ctx,snapshot:{}}, "later");
 assert.equal(none.score,null,"no regional outlook must not invent late signal");
 const old={...ctx,forecast:{daily:{...forecast.daily,time:dates.map((_,i)=>next(i+1))}}};
 assert.equal(sandbox.window.KouRadar.compute(old,"near").score,null,"outdated forecast day cannot be scored");
+// Regression: yesterday's stored run must still produce a trend across midnight.
+const oldDates=Array.from({length:14},(_,i)=>next(i-1));
+const yesterdayForecast={daily:{...forecast.daily,time:oldDates}};
+const yesterdayEns={daily:{...ens.daily,time:oldDates}};
+const prior={
+ collected_at:new Date(Date.now()-9*3600000).toISOString(),
+ location:"De Bilt",forecast:yesterdayForecast,ensemble:yesterdayEns,
+ snow,indices,outlook,source_status:{}
+};
+const compareCtx={...ctx,location:"debilt",snapshot:{...ctx.snapshot,previous:prior}};
+const oldScore=sandbox.window.KouRadar.compute({forecast:yesterdayForecast,ensemble:yesterdayEns,snow,indices,snapshot:{outlook}},"later",oldDates[0]);
+assert.ok(Number.isFinite(oldScore.score),"Yesterday's model must be evaluated on its own reference date");
+const comparison=sandbox.window.KouRadar.trend(compareCtx,"later",later);
+assert.notEqual(comparison.label,"Geen vergelijking","Previous day model must produce a trend");
+assert.ok(["Stabiel","Stijgend","Dalend"].includes(comparison.label));
+const maarssenCompare=sandbox.window.KouRadar.trend({...compareCtx,location:"maarssen"},"later",later);
+assert.equal(maarssenCompare.label,"Geen vergelijking","Do not compare Maarssen with De Bilt forecast");
+console.log("PASS KouRadar yesterday comparison",comparison.label,comparison.details);
 console.log("PASS KouRadar synthetic two horizons, missing models and stale timestamps",near.score,later.score);
