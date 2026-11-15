@@ -132,7 +132,7 @@ def previous_snapshot(download, cache_path=None):
             return None
         instant = dt.datetime.fromisoformat(str(collected).replace("Z", "+00:00"))
         age = dt.datetime.now(dt.timezone.utc) - instant
-        if not (dt.timedelta(hours=1) < age < dt.timedelta(days=4)):
+        if not (dt.timedelta(seconds=0) < age < dt.timedelta(days=4)):
             return None
         daily = ((previous.get("forecast") or {}).get("daily") or {})
         if len(daily.get("time") or []) < 7:
