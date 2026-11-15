@@ -104,7 +104,7 @@ function compute(ctx,windowKey,referenceStart=null){
 }
 function trend(ctx,windowKey,current){
  const old=ctx?.snapshot?.previous;
- if(!old||!old.collected_at||ago(old.collected_at)<1||ago(old.collected_at)>72||!isnum(current.score))
+ if(!old||!old.collected_at||ago(old.collected_at)<0||ago(old.collected_at)>72||!isnum(current.score))
   return {label:"Geen vergelijking",details:"Er is nog geen recente eerdere modelrun beschikbaar."};
  if(ctx.location==="maarssen" && old.location!=="Maarssen")
   return {label:"Geen vergelijking",details:"De vorige serverrun is voor De Bilt, terwijl de gekozen locatie Maarssen is."};
