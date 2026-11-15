@@ -109,7 +109,7 @@ function trend(ctx,windowKey,current){
  if(ctx.location==="maarssen" && old.location!=="Maarssen")
   return {label:"Geen vergelijking",details:"De vorige serverrun is voor De Bilt, terwijl de gekozen locatie Maarssen is."};
  const previousStart=old.forecast?.daily?.time?.[0];
- if(!previousStart || !/^20\\d{2}-\\d{2}-\\d{2}$/.test(previousStart))
+ if(!previousStart || !/^20[0-9]{2}-[0-9]{2}-[0-9]{2}$/.test(previousStart))
   return {label:"Geen vergelijking",details:"De vorige modelrun heeft geen geldige begindatum."};
  const past=compute({forecast:old.forecast,ensemble:old.ensemble,snow:old.snow,indices:old.indices,
    snapshot:{outlook:old.outlook,europe:old.europe,source_status:old.source_status}},windowKey,previousStart);
