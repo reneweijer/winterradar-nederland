@@ -181,7 +181,7 @@ def main():
         collected_at=now.isoformat(), forecast=None,
         ensemble=None, snow=None, upper_air=None, vortex=None, europe=None, outlook=None, previous=None, indices={}, errors={}
     )
-    result["previous"] = previous_snapshot(download)
+    result["previous"] = previous_snapshot(download, ROOT / "data" / "last_good.json")
     operations = {
         "forecast": forecast,
         "europe": lambda: regional_forecast(api),
