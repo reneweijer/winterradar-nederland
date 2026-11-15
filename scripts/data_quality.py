@@ -112,6 +112,7 @@ def merge_sources(result, cache_path, now):
         "source_total": len(statuses),
         "note": "Ophaaltijd per databron. Gecachte modellen zijn geen nieuwe voorspellingen.",
     }
+    saved["indices"] = result.get("indices", {})
     saved["collected_at"] = now.isoformat()
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(saved, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
