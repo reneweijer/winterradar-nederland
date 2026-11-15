@@ -51,10 +51,10 @@ function frostMemberFraction(ensemble,idx,dates){
  const values=memberKeys.map(k=>d[k]?.[eidx]).filter(isnum);
  return values.length>=5?values.filter(v=>v<0).length/values.length:null;
 }
-function compute(ctx,windowKey){
+function compute(ctx,windowKey,referenceStart=null){
  const forecast=ctx?.forecast?.daily||{},dates=forecast.time||[],
  start=windowKey==="near"?0:7,end=start+7;
- const firstDate=localDate(),todayForecast=dates[0]===firstDate;
+ const firstDate=referenceStart||localDate(),todayForecast=dates[0]===firstDate;
  if(dates.length<14||!todayForecast)return {score:null,coverage:0,ready:false,factors:[],reason:"14-daagse voorspelling ontbreekt of begint niet vandaag."};
  const mins=(forecast.temperature_2m_min||[]).slice(start,end).filter(isnum);
  const maxs=(forecast.temperature_2m_max||[]).slice(start,end).filter(isnum);
@@ -104,13 +104,21 @@ function compute(ctx,windowKey){
 }
 function trend(ctx,windowKey,current){
  const old=ctx?.snapshot?.previous;
- if(!old||!old.collected_at||ago(old.collected_at)<3||ago(old.collected_at)>72||!isnum(current.score))return {label:"Geen vergelijking",details:"Nog geen vergelijkbare eerdere modelrun."};
- const past=compute({forecast:old.forecast,ensemble:old.ensemble,snow:old.snow,indices:old.indices,snapshot:{outlook:old.outlook,europe:old.europe,source_status:old.source_status}},windowKey);
+ if(!old||!old.collected_at||ago(old.collected_at)<1||ago(old.collected_at)>72||!isnum(current.score))
+  return {label:"Geen vergelijking",details:"Er is nog geen recente eerdere modelrun beschikbaar."};
+ if(ctx.location==="maarssen" && old.location!=="Maarssen")
+  return {label:"Geen vergelijking",details:"De vorige serverrun is voor De Bilt, terwijl de gekozen locatie Maarssen is."};
+ const previousStart=old.forecast?.daily?.time?.[0];
+ if(!previousStart || !/^20\\d{2}-\\d{2}-\\d{2}$/.test(previousStart))
+  return {label:"Geen vergelijking",details:"De vorige modelrun heeft geen geldige begindatum."};
+ const past=compute({forecast:old.forecast,ensemble:old.ensemble,snow:old.snow,indices:old.indices,
+   snapshot:{outlook:old.outlook,europe:old.europe,source_status:old.source_status}},windowKey,previousStart);
  if(!isnum(past.score))return {label:"Geen vergelijking",details:"Vorige modelrun bevat onvoldoende overeenkomende gegevens."};
  const delta=current.score-past.score;
  const time=new Date(old.collected_at).toLocaleString("nl-NL",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});
  return {label:Math.abs(delta)<4?"Stabiel":delta>0?"Stijgend":"Dalend",
-   details:(delta>0?"+":"")+delta+" scorepunten sinds "+time+" (voorspelvensters kunnen verschuiven).",delta};
+   details:(delta>0?"+":"")+delta+" scorepunten sinds "+time+
+    (previousStart!==localDate()?" (de 7-daagse vensters zijn sinds die modelrun verschoven; een trend is geen kanspercentage).":" (dezelfde startdatum)."),delta};
 }
 function details(head,record){
  const rows=record.factors.map(f=>'<div class="kr-factor"><span>'+f.label+'</span><strong>'+
@@ -215,6 +223,6 @@ function update(ctx){
   }).catch(()=>{}).finally(()=>{pendingOutlook=null;});
  }
 }
-window.KouRadar={update,compute};
+window.KouRadar={update,compute,trend};
 if(window.__winterCurrent)update(window.__winterCurrent);
 })();
