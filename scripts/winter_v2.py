@@ -115,35 +115,64 @@ def regional_forecast(api):
     )
 
 
-def previous_snapshot(download):
-    """Fetch the previous published daily snapshot to compare matching dates."""
-    url="https://reneweijer.github.io/winterradar-nederland/data/latest.json"
-    try:
-        import json
-        previous=json.loads(download(url, timeout=8))
-        instant=dt.datetime.fromisoformat(previous["collected_at"].replace("Z","+00:00"))
-        age=dt.datetime.now(dt.timezone.utc)-instant
-        if not (dt.timedelta(hours=6)<age<dt.timedelta(days=7)):
+def previous_snapshot(download, cache_path=None):
+    """Load prior model run, preferring the persisted local cache to network.
+
+    The archive's original model dates are deliberately preserved so the
+    previous seven-day window can be scored at its *original* reference day.
+    """
+    import json
+    from pathlib import Path
+
+    def as_snapshot(previous):
+        if not isinstance(previous, dict):
             return None
-        daily=((previous.get("forecast") or {}).get("daily") or {})
+        collected = previous.get("collected_at")
+        if not collected:
+            return None
+        instant = dt.datetime.fromisoformat(str(collected).replace("Z", "+00:00"))
+        age = dt.datetime.now(dt.timezone.utc) - instant
+        if not (dt.timedelta(hours=1) < age < dt.timedelta(days=4)):
+            return None
+        daily = ((previous.get("forecast") or {}).get("daily") or {})
+        if len(daily.get("time") or []) < 7:
+            return None
         return dict(
-            collected_at=previous["collected_at"],
+            collected_at=collected,
             location="De Bilt",
             forecast=dict(daily={
-                "time": daily.get("time",[]),
-                "temperature_2m_min":daily.get("temperature_2m_min",[]),
-                "temperature_2m_max":daily.get("temperature_2m_max",[]),
-                "wind_direction_10m_dominant":daily.get("wind_direction_10m_dominant",[]),
+                "time": daily.get("time", []),
+                "temperature_2m_min": daily.get("temperature_2m_min", []),
+                "temperature_2m_max": daily.get("temperature_2m_max", []),
+                "wind_direction_10m_dominant": daily.get("wind_direction_10m_dominant", []),
             }),
             ensemble=previous.get("ensemble"),
             snow=previous.get("snow"),
             europe=previous.get("europe"),
             outlook=previous.get("outlook"),
             source_status=previous.get("source_status"),
-            indices={k:dict(date=v.get("date"),value=v.get("value"))
-                     for k,v in (previous.get("indices") or {}).items()
-                     if isinstance(v,dict)},
+            indices={k: dict(date=v.get("date"), value=v.get("value"))
+                     for k, v in (previous.get("indices") or {}).items()
+                     if isinstance(v, dict)},
         )
+
+    if cache_path:
+        try:
+            local = Path(cache_path)
+            if local.exists():
+                result = as_snapshot(json.loads(local.read_text(encoding="utf-8")))
+                if result is not None:
+                    print("Previous KouRadar model run from local cache:", result["collected_at"])
+                    return result
+        except Exception as exc:
+            print("Previous local model unavailable:", str(exc)[:130])
+
+    url = "https://reneweijer.github.io/winterradar-nederland/data/latest.json"
+    try:
+        result = as_snapshot(json.loads(download(url, timeout=8)))
+        if result is not None:
+            print("Previous KouRadar model run from site snapshot:", result["collected_at"])
+        return result
     except Exception as exc:
-        print("No prior daily snapshot available:",str(exc)[:130])
+        print("No prior daily model snapshot available:", str(exc)[:130])
         return None
