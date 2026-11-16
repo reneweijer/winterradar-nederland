@@ -67,25 +67,6 @@ function analysisInputs(forecast,ens,east,indices,snapshot){
  const circ=naoval===null&&aoval===null?null:Math.min(...[naoval,aoval].filter(Number.isFinite));
  return {ok:true,days,mins,maxs,dirs,frost,ice,easterlies,longest,ensDays,snow,snowCoverage,t850,pressureDiff,naoval,aoval,circ,site:snapshot?.europe?.model||null};
 }
-function computeSignal(a){
- if(!a.ok)return {value:null,coverage:0,note:"Onvoldoende 7-daagse temperatuurinformatie"};
- const components=[
-  {name:"Lokale minimumtemperatuur",w:25,v:Math.min(25,18*a.frost/7+7*a.ice/7)},
-  {name:"Ensemblemodel",w:15,v:a.ensDays?.slice(0,7).filter(Boolean).length>=5?Math.min(15,15*mean(a.ensDays.slice(0,7).filter(Boolean).map(x=>x.fraction))):null},
-  {name:"Aanhoudende oostenwind",w:20,v:Math.min(20,12*a.longest/5+8*a.easterlies/7)},
-  {name:"Koude lucht boven brongebied",w:20,v:Number.isFinite(a.t850)?(a.t850<=-7?20:a.t850<=-4?15:a.t850<=-1?9:a.t850<=2?4:0):null},
-  {name:"Sneeuw in brongebied",w:5,v:a.snowCoverage!==null?5*a.snowCoverage/a.snow.length:null},
-  {name:"Luchtdruk in Scandinavië",w:10,v:a.pressureDiff!==null?(a.pressureDiff>=12?10:a.pressureDiff>=5?7:a.pressureDiff>=0?3:0):null},
-  {name:"NAO/AO gezamenlijk",w:5,v:a.circ!==null?(a.circ<=-1.5?5:a.circ<=-.5?3:a.circ<=0?1:0):null}
- ];
- const available=components.filter(x=>Number.isFinite(x.v));
- const coverage=available.reduce((n,c)=>n+c.w,0);
- const points=available.reduce((n,c)=>n+c.v,0);
- const sufficient=coverage>=85&&available.some(x=>x.name==="Ensemblemodel");
- const value=sufficient?Math.round(points):null;
- const category=value===null?"Onvoldoende gegevens":value>=68?"Sterke wintersignalen":value>=45?"Verhoogde signalen":value>=23?"Enkele wintersignalen":"Weinig wintersignalen";
- return {value,category,coverage,components,points:Math.round(points)};
-}
 function stageCard(h,label,main,detail) {
  if(!e(h+"Main"))return;
  e(h+"Main").textContent=main;
@@ -125,10 +106,9 @@ function showAnalysis(forecast,ens,east,indices,snapshot,loc) {
   stageCard("v2Month","15–30 dagen","Alleen signalen","Geen betrouwbare lokale dagelijkse vorstverwachting.");
   e("v2Reasons").innerHTML="<li>Weergave toont geen ingevulde kansen wanneer bronnen ontbreken.</li>";
   e("v2Delta").textContent="Geen vergelijkbare update beschikbaar.";
-  e("v2Coverage").textContent="Modelbron onvoldoende volledig.";
+  e("v2Coverage").textContent="Modelbron onvoldoende volledig.";if(e("decisionYesterday"))e("decisionYesterday").textContent="Onvoldoende actuele modelgegevens voor vergelijking.";
   return;
  }
- const signal=computeSignal(a);
  const minsNext=a.mins.slice(7,14),maxNext=a.maxs.slice(7,14);
  const futureFrost=minsNext.filter(x=>Number.isFinite(x)&&x<0).length;
  const laterProb=a.ensDays?mean(a.ensDays.slice(7,14).filter(Boolean).map(x=>x.fraction)):null;
@@ -156,15 +136,10 @@ function showAnalysis(forecast,ens,east,indices,snapshot,loc) {
  if(a.circ!==null)evidence.push("NAO en AO als één samenhangend circulatiesignaal beoordeeld, niet dubbel meegeteld.");
  if(!a.snow&&!Number.isFinite(a.pressureDiff))evidence.push("Regionale atmosfeerbronnen zijn onvolledig, daarom voorzichtig interpreteren.");
  e("v2Reasons").innerHTML=evidence.map(x=>"<li>"+escapeHtml(x)+"</li>").join("");
- e("v2Delta").textContent=diffSincePrevious(snapshot?.previous,forecast,loc,indices);
- e("v2Coverage").textContent="Gegevensdekking voor de experimentele winterpotentieel-indicator: "+signal.coverage+"% van de gewichten beschikbaar. Geen statistisch gevalideerde voorspelling.";
- const score=e("winterScore"),name=e("winterLabel");
- if(score)score.textContent=signal.value===null?"—":signal.value+"/100";
- if(name)name.textContent=signal.category;
- if(e("winterExplain"))e("winterExplain").textContent="Experimentele signaalmeter uit lokale vorst, ensemble, oostenwind, koudeaanvoer, sneeuw, luchtdruk en NAO/AO. "+signal.coverage+"% datadekking. Geen berekende winterkans.";
- const gauge=e("homeGauge");
- if(gauge)gauge.style.setProperty("--score",signal.value===null?0:signal.value);
- if(e("scorebar"))e("scorebar").style.width=(signal.value===null?0:signal.value)+"%";
+ const delta=diffSincePrevious(snapshot?.previous,forecast,loc,indices);
+ e("v2Delta").textContent=delta;
+ if(e("decisionYesterday"))e("decisionYesterday").textContent=delta;
+ e("v2Coverage").textContent="Eén wintersignaalmeter: KouRadar. Deze is experimenteel en geen statistische winterkans.";
 }
 function escapeHtml(input) {return String(input).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]));}
 function mapColor(key,value) {
@@ -184,6 +159,7 @@ function renderMap() {
   if(usable>=0){frameNum=usable;frame=snap.frames[usable];if(e("v2MapTime"))e("v2MapTime").value=String(usable);}
   else frame=null;
  }
+ const slider=e("mapTimeSlider"),timeLabel=e("mapTimeLabel");if(slider){slider.max=String(Math.max(0,(snap?.frames?.length||1)-1));slider.value=String(frameNum);}if(timeLabel)timeLabel.textContent=frame?.valid_for?"Modeltijd "+new Date(frame.valid_for).toLocaleString("nl-NL",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit",timeZone:"Europe/Amsterdam"}):"Geen actueel modeltijdstip";
  const kind=e("v2MapLayer")?.value||"pressure_hpa";
  const units={pressure_hpa:"hPa",wind10_kmh:"km/u",t850_c:"°C",jet250_kmh:"km/u"};
  const layerLabel={pressure_hpa:"luchtdruk op zeeniveau",wind10_kmh:"wind op 10 meter",t850_c:"temperatuur op 850 hPa",jet250_kmh:"wind op 250 hPa"};
@@ -230,6 +206,10 @@ function refresh(ctx){
 function init(){
  if(e("v2MapLayer"))e("v2MapLayer").addEventListener("change",renderMap);
  if(e("v2MapTime"))e("v2MapTime").addEventListener("change",renderMap);
+ const slider=e("mapTimeSlider");if(slider)slider.addEventListener("input",()=>{e("v2MapTime").value=slider.value;renderMap();});
+ for(const [id,step] of [["mapPrev",-1],["mapNext",1]])if(e(id))e(id).addEventListener("click",()=>{const t=e("v2MapTime");const count=lastSnapshot?.europe?.frames?.length||3;t.value=String(Math.max(0,Math.min(count-1,Number(t.value)+step)));renderMap();});
+ document.querySelectorAll("[data-map-layer]").forEach(btn=>btn.addEventListener("click",()=>{e("v2MapLayer").value=btn.dataset.mapLayer;renderMap();}));
+
  if(window.__winterCurrent)refresh(window.__winterCurrent);
 }
 window.WinterV2={refresh,init};
