@@ -315,9 +315,7 @@ function updateHomeIndicators(v,ens,east,indices){
   const measured=counts.filter(Number.isFinite);
   $('homeSnowRegion').textContent=measured.length?measured.filter(x=>x>0.01).length+' / '+measured.length:'—';
  }else $('homeSnowRegion').textContent='—';
- const scoreText=$('winterScore')?.textContent||'';
- const score=parseInt(scoreText,10);
- $('homeGauge').style.setProperty('--score',Number.isFinite(score)?Math.min(100,Math.max(0,score)):0);
+ // Eén centrale KouRadar-score; de verwijderde tweede meter wordt niet meer bijgewerkt.
 }
 
 const isEast=x=>Number.isFinite(x)&&x>=45&&x<=135;
