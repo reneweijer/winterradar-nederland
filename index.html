@@ -218,14 +218,14 @@
 .ice-intro .ice-metric{background:#0b1929;border-color:#24425a}
 @media(max-width:600px){.ice-cinematic{height:clamp(350px,49vh,460px)}.ice-intro .ice-metrics{grid-template-columns:repeat(3,minmax(0,1fr))}}
 </style></head><body><div class="ice-intro" id="iceIntro" role="dialog" aria-modal="true" aria-label="Introductie: van de laatste ijstijd naar vandaag" hidden>
-<div class="ice-intro-inner"><div id="iceBuildDiagnostic" style="position:relative;z-index:20;font-size:11px;color:#a6e7ff;letter-spacing:.06em">SPACE FILM V8 · 3D-STATUS: LADEN</div><div class="ice-intro-top"><strong>WINTERRADAR · NASA-LOOK · SPACE FILM V8</strong><button id="iceSkip" type="button">Intro overslaan ✕</button></div>
+<div class="ice-intro-inner"><div id="iceBuildDiagnostic" style="position:relative;z-index:20;font-size:11px;color:#a6e7ff;letter-spacing:.06em">SPACE FILM V9 · 3D-STATUS: LADEN</div><div class="ice-intro-top"><strong>WINTERRADAR · NASA-LOOK · SPACE FILM V9</strong><button id="iceSkip" type="button">Intro overslaan ✕</button></div>
 <h2 id="iceTitle">21.000 jaar geleden · de laatste ijstijd</h2>
 <div class="ice-stage ice-cinematic" aria-label="Filmische ruimteanimatie met draaiende aarde, zon en schematische aardbaan">
-<div class="ice-film-label">WINTERRADAR · NASA-LOOK V8</div><div id="ice3dMount" class="ice-3d-mount" aria-hidden="true"></div><div class="ice-stars ice-stars-near"></div><div class="ice-stars ice-stars-far"></div><div class="ice-nebula"></div>
+<div class="ice-film-label">WINTERRADAR · NASA-LOOK V9</div><div id="ice3dMount" class="ice-3d-mount" aria-hidden="true"></div><div class="ice-stars ice-stars-near"></div><div class="ice-stars ice-stars-far"></div><div class="ice-nebula"></div>
 <div class="ice-sun-halo"></div><div class="ice-sun-beams"></div><div class="ice-sun"></div>
 <div class="ice-orbit ancient" id="iceOrbit"></div>
 <div class="ice-earth-path"><div class="ice-earth-holder"><div class="ice-earth-axis" id="iceAxis"><div class="ice-earth" id="iceEarth"><div class="ice-earth-surface"></div><div class="ice-clouds"></div><div class="ice-earth-shadow"></div></div></div><div class="ice-axis-caption">23,4°</div></div></div>
-<div class="ice-stage-caption"><span class="ice-stage-pill">● CINEMATISCHE 3D · V8</span><span>Rotatie aarde · omloop schematisch versneld</span></div>
+<div class="ice-stage-caption"><span class="ice-stage-pill">● CINEMATISCHE 3D · V9</span><span>Rotatie aarde · omloop schematisch versneld</span></div>
 </div>
 <div class="ice-metrics"><div class="ice-metric"><span>Aardashelling</span><strong id="iceTilt">circa 22,9°</strong></div><div class="ice-metric"><span>Afstand aarde–zon</span><strong id="iceDistance">Verandert tijdens de baan</strong></div><div class="ice-metric"><span>Aardbaan</span><strong id="iceOrbitText">Licht elliptisch</strong></div></div>
 <p id="iceNarration">Tijdens het Laatste Glaciale Maximum bedekten enorme ijskappen delen van Noord-Amerika en Europa. Veranderingen in de baan en de aardas beïnvloedden de verdeling van zonlicht over seizoenen.</p>
@@ -545,18 +545,18 @@ for(let i=0;i<150;i++){const x=rand()*W,y=rand()*H;const width=15+rand()*110;c.b
 const globe=document.querySelector(".ice-earth-surface");if(globe)globe.style.backgroundImage="url("+canvas.toDataURL("image/jpeg",.88)+")";
 }catch(err){/* Keep the CSS-rendered Earth if canvas is unavailable. */}
 })();
-</script><script id="ice-space-webgl-v7">
+</script><script id="ice-space-webgl-v9">
 (function(){
 "use strict";
 const stage=document.querySelector(".ice-cinematic"),mount=document.getElementById("ice3dMount"),intro=document.getElementById("iceIntro");
 if(!stage||!mount||!intro)return;
 const diagnostic=document.getElementById("iceBuildDiagnostic");
-const status=(t)=>{if(diagnostic)diagnostic.textContent="SPACE FILM V8 · "+t};
+const status=(t)=>{if(diagnostic)diagnostic.textContent="SPACE FILM V9 · "+t};
 function init(){
 const T=window.THREE;if(!T){status("3D-bibliotheek ontbreekt");return}
 let renderer;try{renderer=new T.WebGLRenderer({antialias:true,alpha:false,powerPreference:"high-performance"})}catch(e){status("3D niet beschikbaar");return}
 renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.7));renderer.setClearColor(0x01030a,1);
-renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.04;
+renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.12;
 mount.appendChild(renderer.domElement);
 const scene=new T.Scene();scene.background=new T.Color(0x01030a);
 const camera=new T.PerspectiveCamera(36,1,.1,500);
@@ -587,20 +587,21 @@ load("https://threejs.org/examples/textures/planets/earth_normal_2048.jpg",t=>{e
 load("https://threejs.org/examples/textures/planets/earth_clouds_1024.png",t=>{cloudMat.map=t;cloudMat.alphaMap=t;cloudMat.needsUpdate=true});
 const sunTextureCanvas=document.createElement("canvas");sunTextureCanvas.width=1024;sunTextureCanvas.height=512;
 const ctx=sunTextureCanvas.getContext("2d");let seed=8765321;function rand(){seed=(1664525*seed+1013904223)>>>0;return seed/4294967296}
-const g=ctx.createLinearGradient(0,0,1024,512);g.addColorStop(0,"#fff3a3");g.addColorStop(.3,"#fcb23c");g.addColorStop(.7,"#f46b16");g.addColorStop(1,"#d4470a");ctx.fillStyle=g;ctx.fillRect(0,0,1024,512);
-for(let i=0;i<16000;i++){let x=rand()*1024,y=rand()*512,r=.4+rand()*5;ctx.beginPath();ctx.arc(x,y,r,0,6.283);ctx.fillStyle=rand()>.5?"rgba(255,239,161,.12)":"rgba(117,26,0,.08)";ctx.fill()}
+const g=ctx.createLinearGradient(0,0,1024,512);g.addColorStop(0,"#ffe9a0");g.addColorStop(.3,"#ffc05b");g.addColorStop(.7,"#f58b28");g.addColorStop(1,"#dd5813");ctx.fillStyle=g;ctx.fillRect(0,0,1024,512);
+for(let i=0;i<24000;i++){let x=rand()*1024,y=rand()*512,r=.4+rand()*3.2;ctx.beginPath();ctx.arc(x,y,r,0,6.283);ctx.fillStyle=rand()>.5?"rgba(255,244,190,.16)":"rgba(115,30,0,.13)";ctx.fill()}
 const sunTex=new T.CanvasTexture(sunTextureCanvas);sunTex.colorSpace=T.SRGBColorSpace;
 const sun=new T.Mesh(new T.SphereGeometry(3.6,96,64),new T.MeshBasicMaterial({map:sunTex,color:0xffffff,toneMapped:false}));sun.position.set(-14,1.5,-13);scene.add(sun);
 const coronaCanvas=document.createElement("canvas");coronaCanvas.width=512;coronaCanvas.height=512;const cc=coronaCanvas.getContext("2d");
 const glow=cc.createRadialGradient(256,256,15,256,256,256);glow.addColorStop(0,"rgba(255,252,220,1)");glow.addColorStop(.16,"rgba(255,222,115,.92)");glow.addColorStop(.27,"rgba(255,168,44,.54)");glow.addColorStop(.48,"rgba(255,103,15,.19)");glow.addColorStop(1,"rgba(255,80,0,0)");
 cc.fillStyle=glow;cc.fillRect(0,0,512,512);
-const corona=new T.Sprite(new T.SpriteMaterial({map:new T.CanvasTexture(coronaCanvas),transparent:true,opacity:.85,depthWrite:false,blending:T.AdditiveBlending}));corona.position.copy(sun.position);corona.scale.set(19,19,1);scene.add(corona);
+const corona=new T.Sprite(new T.SpriteMaterial({map:new T.CanvasTexture(coronaCanvas),transparent:true,opacity:.85,depthWrite:false,blending:T.AdditiveBlending}));corona.position.copy(sun.position);corona.scale.set(22,22,1);scene.add(corona);
+const outerCorona=new T.Sprite(new T.SpriteMaterial({map:new T.CanvasTexture(coronaCanvas),transparent:true,opacity:.22,depthWrite:false,blending:T.AdditiveBlending}));outerCorona.position.copy(sun.position);outerCorona.scale.set(32,32,1);scene.add(outerCorona);
 // A few restrained, moving plasma-loop silhouettes around the Sun.
 const flares=new T.Group();flares.position.copy(sun.position);scene.add(flares);
 for(let j=0;j<7;j++){const pts=[],a=j*Math.PI*2/7;for(let k=0;k<=36;k++){const t=k/36*Math.PI;const radius=3.55+.6*Math.sin(t);pts.push(new T.Vector3(Math.cos(a)*radius+Math.cos(a+1.1)*Math.sin(t)*.6,Math.sin(a)*radius+Math.sin(a+1.1)*Math.sin(t)*.6,Math.sin(t)*1.4))}
 const curve=new T.CatmullRomCurve3(pts);const mesh=new T.Mesh(new T.TubeGeometry(curve,48,.022,5,false),new T.MeshBasicMaterial({color:j%2?0xffb349:0xffe6a3,transparent:true,opacity:.36,blending:T.AdditiveBlending,depthWrite:false}));flares.add(mesh)}
 
-const sunlight=new T.DirectionalLight(0xfff1db,3.3);sunlight.position.set(-9,3,9);scene.add(sunlight);
+const sunlight=new T.DirectionalLight(0xfff1db,3.3);sunlight.position.copy(sun.position);scene.add(sunlight);
 scene.add(new T.AmbientLight(0x6689bd,.44));
 const stars=[];for(let i=0;i<1700;i++){let x=(rand()-.5)*170,y=(rand()-.5)*110,z=-15-rand()*140;stars.push(x,y,z)}
 const sg=new T.BufferGeometry();sg.setAttribute("position",new T.Float32BufferAttribute(stars,3));scene.add(new T.Points(sg,new T.PointsMaterial({color:0xd6e6ff,size:.105,sizeAttenuation:true,transparent:true,opacity:.82})));
@@ -618,23 +619,25 @@ t0+=dt;
 const mobile=mount.clientWidth<650;
 const p=Math.min(t0/20,1);
 // Four five-second chapters: ice-age ice cover fades into the present.
-const chapter=Math.min(3,Math.floor(p*4));
+// Chapters represent a compressed history, not an orbital simulation.
 const melt=Math.max(0,Math.min(1,(p-.42)/.37));
 iceMaterial.opacity=(1-melt)*.87;
 axisLine.material.opacity=p>.65?.5:.18;northMarker.material.opacity=axisLine.material.opacity;
+// Tilt changes by only about half a degree here: intentionally not exaggerated.
 earthPivot.rotation.z=(22.9+(23.44-22.9)*melt)*Math.PI/180;
 flares.rotation.z=t0*.014;
 
 const smooth=x=>x*x*(3-2*x);
-const move=smooth(Math.min(1,p*1.4));
-const distance=(mobile?18.5:17.3)-move*(mobile?8.2:8.1);
-const x=(mobile?4.4:5.4)-move*(mobile?2.6:3.1);
-camera.position.set(x+Math.sin(t0*.12)*.3,1.15+Math.sin(t0*.17)*.2,distance);
+const approach=smooth(Math.min(1,p/.68));
+const settle=smooth(Math.max(0,Math.min(1,(p-.68)/.32)));
+const distance=(mobile?23:22)-approach*(mobile?12.5:12.0)+settle*.5;
+const x=(mobile?5.6:6.6)-approach*(mobile?3.5:4.2)+settle*.2;
+camera.position.set(x+Math.sin(t0*.12)*.15,1.5-approach*.6+Math.sin(t0*.17)*.08,distance);
 camera.lookAt(mobile?-.1:-1.4,0,-1.4);
 earthPivot.position.set(mobile?1.45:2.5,-.15,0);
 earth.rotation.y+=dt*.27;iceSheet.rotation.y=earth.rotation.y;clouds.rotation.y+=dt*.29;sun.rotation.y+=dt*.025;
 moon.position.set(earthPivot.position.x+3.5*Math.cos(t0*.17),-.3+1.4*Math.sin(t0*.17),-3);
-corona.material.opacity=.72+Math.sin(t0*.8)*.05;
+corona.material.opacity=.7+Math.sin(t0*.8)*.06;outerCorona.material.opacity=.16+Math.sin(t0*.47)*.04;
 if(p>.55){orbit.material.opacity=Math.min(.13,(p-.55)*.4)}else orbit.material.opacity=0;
 renderer.render(scene,camera);
 }
