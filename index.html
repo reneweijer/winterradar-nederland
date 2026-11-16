@@ -146,10 +146,45 @@
 @keyframes ice-sun-pulse{50%{box-shadow:0 0 45px #f7a63d,0 0 120px #e88c3266}}@keyframes ice-orbit-spin{to{transform:rotate(360deg)}}@keyframes ice-earth-spin{50%{filter:brightness(.82)}}
 @media(max-width:600px){.ice-intro{padding:14px}.ice-stage{height:245px}.ice-metrics{gap:5px}.ice-metric{padding:8px}.ice-metric span{font-size:10px}.ice-intro p{font-size:13px;min-height:67px}.ice-actions small{font-size:11px}}
 @media(prefers-reduced-motion:reduce){.ice-intro *{animation:none!important;transition:none!important}}
+</style><style id="ice-cinematic-upgrade">
+.ice-intro{background:radial-gradient(ellipse at 65% 30%,#0d2442,#030813 70%);backdrop-filter:blur(12px)}
+.ice-intro-inner{width:min(1100px,100%);gap:13px}
+.ice-intro h2{font-weight:800;letter-spacing:-.025em;text-shadow:0 3px 24px #000b}
+.ice-cinematic{height:clamp(320px,49vh,500px);background:radial-gradient(ellipse at 70% 50%,#13233c 0%,#050c1c 45%,#02040b 100%);border:1px solid #4b7395;box-shadow:0 18px 75px #0009,inset 0 0 80px #000a}
+.ice-stars{position:absolute;inset:-40%;pointer-events:none;background-repeat:repeat;animation:ice-star-drift 32s linear infinite}
+.ice-stars-near{background-image:radial-gradient(circle,#fff 1px,transparent 1.8px),radial-gradient(circle,#c7e8ff 1px,transparent 1.6px);background-size:113px 103px,173px 157px;background-position:12px 19px,73px 51px;opacity:.7}
+.ice-stars-far{background-image:radial-gradient(circle,#fff9 .6px,transparent 1.4px);background-size:39px 53px;opacity:.3;animation-duration:70s;animation-direction:reverse}
+.ice-nebula{position:absolute;inset:-25%;background:radial-gradient(ellipse at 34% 43%,#23588738,transparent 40%),radial-gradient(ellipse at 82% 30%,#694a6d29,transparent 48%);filter:blur(22px)}
+.ice-cinematic .ice-sun{left:19%;top:49%;width:clamp(105px,17vw,185px);background:radial-gradient(circle at 35% 28%,#fffef5 0%,#fff9bf 14%,#ffe16d 31%,#ff9d2f 62%,#ad3411 100%);box-shadow:0 0 20px 5px #fff5aa,0 0 65px 20px #f8a3369e,0 0 150px 48px #ef7c2444;z-index:3}
+.ice-sun-halo{position:absolute;left:19%;top:49%;width:34%;aspect-ratio:1;border-radius:50%;transform:translate(-50%,-50%);background:radial-gradient(circle,#ffb64e44 0%,#ff9a1a24 35%,transparent 72%);filter:blur(10px);animation:ice-sun-pulse 5s ease-in-out infinite}
+.ice-sun-beams{position:absolute;left:19%;top:49%;width:70%;height:2px;background:linear-gradient(90deg,#fff7d9bb,#ffd66a55 30%,transparent);transform:translateY(-50%);filter:blur(1px);z-index:2}
+.ice-cinematic .ice-orbit{left:57%;top:50%;width:68%;height:80%;border:1.5px solid #c8e5f488;transform:translate(-50%,-50%) rotate(-13deg);box-shadow:0 0 16px #8fd1ff22;z-index:2}
+.ice-cinematic .ice-orbit.ancient{border-radius:48%}
+.ice-cinematic .ice-earth-path{z-index:5;animation:ice-orbit-spin 18s linear infinite}
+.ice-earth-holder{position:absolute;left:71%;top:37%;width:clamp(105px,18vw,190px);aspect-ratio:1;filter:drop-shadow(0 0 28px #6cbfff88)}
+.ice-earth-axis{position:relative;width:100%;height:100%;transform:rotate(var(--ice-axis,23.44deg));transition:transform 2s}
+.ice-cinematic .ice-earth{position:absolute;inset:0;width:100%;height:100%;left:0;top:0;overflow:hidden;transform:rotate(calc(-1 * var(--ice-axis,23.44deg)));animation:none;background:radial-gradient(circle at 30% 24%,#92d7fc,#1a6aaf 46%,#042f65 80%);box-shadow:inset -25px -8px 34px #001020,0 0 2px 2px #a7e9ff,0 0 25px #71c8ff99}
+.ice-cinematic .ice-earth:before,.ice-cinematic .ice-earth:after{display:none}
+.ice-earth-surface{position:absolute;inset:-2%;border-radius:50%;background-image:radial-gradient(ellipse at 14% 28%,#bedbb9 0 9%,transparent 11%),radial-gradient(ellipse at 32% 42%,#5c9c6f 0 15%,transparent 17%),radial-gradient(ellipse at 52% 70%,#a2bd88 0 10%,transparent 12%),radial-gradient(ellipse at 72% 30%,#b6c9a5 0 17%,transparent 19%),radial-gradient(ellipse at 94% 57%,#77a27d 0 12%,transparent 14%);background-size:170% 100%;animation:ice-planet-rotate 6s linear infinite}
+.ice-clouds{position:absolute;inset:0;border-radius:50%;background:repeating-linear-gradient(165deg,transparent 0 18px,#d4f4ff55 19px 22px,transparent 24px 45px);opacity:.45;animation:ice-planet-rotate 10s linear infinite reverse}
+.ice-earth-shadow{position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 21% 36%,transparent 15%,#00152b10 36%,#000b1cd9 83%);box-shadow:inset -12px -5px 18px #000c}
+.ice-axis-caption{position:absolute;right:-25px;bottom:8px;font-size:11px;color:#a5dfff;text-shadow:0 2px 5px #000}
+.ice-stage-caption{position:absolute;left:15px;right:15px;bottom:13px;display:flex;align-items:center;justify-content:space-between;gap:10px;z-index:8;font-size:11px;color:#c3e0f2;text-shadow:0 2px 7px #000}
+.ice-stage-pill{border:1px solid #85c9ee88;border-radius:20px;padding:5px 9px;background:#041a2bc7;font-weight:700;letter-spacing:1px}
+.ice-cinematic .ice-earth-path{transform-origin:57% 50%}
+@keyframes ice-star-drift{to{transform:translate3d(40px,25px,0)}}@keyframes ice-planet-rotate{to{background-position:170% 0}}
+@media(max-width:600px){.ice-cinematic{height:clamp(270px,38vh,360px)}.ice-cinematic .ice-sun{left:17%;width:88px}.ice-cinematic .ice-orbit{left:53%;width:85%;height:73%}.ice-earth-holder{left:63%;top:34%;width:110px}.ice-stage-caption{font-size:9px}.ice-stage-pill{letter-spacing:0}.ice-sun-halo{left:17%}.ice-sun-beams{left:17%}}
+@media(prefers-reduced-motion:reduce){.ice-cinematic *{animation:none!important}}
 </style></head><body><div class="ice-intro" id="iceIntro" role="dialog" aria-modal="true" aria-label="Introductie: van de laatste ijstijd naar vandaag" hidden>
 <div class="ice-intro-inner"><div class="ice-intro-top"><strong>WINTERRADAR · REIS DOOR DE TIJD</strong><button id="iceSkip" type="button">Intro overslaan ✕</button></div>
 <h2 id="iceTitle">21.000 jaar geleden · de laatste ijstijd</h2>
-<div class="ice-stage" aria-label="Schematische animatie van aarde, zon, aardbaan en aardas"><div class="ice-orbit ancient" id="iceOrbit"></div><div class="ice-sun"></div><div class="ice-earth-path"><div class="ice-earth" id="iceEarth"></div></div></div>
+<div class="ice-stage ice-cinematic" aria-label="Filmische ruimteanimatie met draaiende aarde, zon en schematische aardbaan">
+<div class="ice-stars ice-stars-near"></div><div class="ice-stars ice-stars-far"></div><div class="ice-nebula"></div>
+<div class="ice-sun-halo"></div><div class="ice-sun-beams"></div><div class="ice-sun"></div>
+<div class="ice-orbit ancient" id="iceOrbit"></div>
+<div class="ice-earth-path"><div class="ice-earth-holder"><div class="ice-earth-axis" id="iceAxis"><div class="ice-earth" id="iceEarth"><div class="ice-earth-surface"></div><div class="ice-clouds"></div><div class="ice-earth-shadow"></div></div></div><div class="ice-axis-caption">23,4°</div></div></div>
+<div class="ice-stage-caption"><span class="ice-stage-pill">● RUIMTECAMERA</span><span>Rotatie aarde · omloop schematisch versneld</span></div>
+</div>
 <div class="ice-metrics"><div class="ice-metric"><span>Aardashelling</span><strong id="iceTilt">circa 22,9°</strong></div><div class="ice-metric"><span>Afstand aarde–zon</span><strong id="iceDistance">Verandert tijdens de baan</strong></div><div class="ice-metric"><span>Aardbaan</span><strong id="iceOrbitText">Licht elliptisch</strong></div></div>
 <p id="iceNarration">Tijdens het Laatste Glaciale Maximum bedekten enorme ijskappen delen van Noord-Amerika en Europa. Veranderingen in de baan en de aardas beïnvloedden de verdeling van zonlicht over seizoenen.</p>
 <div class="ice-progress" aria-hidden="true"><div id="iceProgress"></div></div><div class="ice-actions"><small>Wetenschappelijke schematisering · afstanden, ellipsvorm en rotatiesnelheid niet op schaal</small><button class="ice-primary" id="iceContinue" type="button">Naar Winterradar →</button></div>
@@ -454,7 +489,7 @@ const scenes=[
 ];
 let start=0,raf=0,shown=-1;const duration=20000;
 function close(){cancelAnimationFrame(raf);intro.hidden=true;document.body.style.overflow="";try{sessionStorage.setItem("winterradarIntroSeen","1")}catch(_){}}
-function paint(i){const x=scenes[i];title.textContent=x.title;narr.textContent=x.text;tilt.textContent=x.tilt;distance.textContent=x.distance;orbitText.textContent=x.orbit;orbit.classList.toggle("ancient",x.ancient);earth.style.setProperty("--ice-axis",x.ancient?"22.9deg":"23.44deg");shown=i;}
+function paint(i){const x=scenes[i];title.textContent=x.title;narr.textContent=x.text;tilt.textContent=x.tilt;distance.textContent=x.distance;orbitText.textContent=x.orbit;orbit.classList.toggle("ancient",x.ancient);document.getElementById("iceAxis").style.setProperty("--ice-axis",x.ancient?"22.9deg":"23.44deg");shown=i;}
 function tick(now){if(!start)start=now;const elapsed=now-start;const p=Math.min(1,elapsed/duration),i=Math.min(3,Math.floor(p*4));if(i!==shown)paint(i);progress.style.width=(p*100)+"%";if(p>=1){close();return}raf=requestAnimationFrame(tick)}
 skip.addEventListener("click",close);go.addEventListener("click",close);const replay=document.getElementById("replayIceIntro");if(replay)replay.addEventListener("click",()=>{cancelAnimationFrame(raf);start=0;shown=-1;intro.hidden=false;document.body.style.overflow="hidden";paint(0);progress.style.width="0%";if(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches){paint(3);progress.style.width="100%"}else raf=requestAnimationFrame(tick)});
 document.addEventListener("keydown",e=>{if(!intro.hidden&&e.key==="Escape")close()});
