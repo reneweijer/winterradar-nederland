@@ -210,7 +210,7 @@
 .ice-cinematic .ice-stage-caption{z-index:10}
 @media(max-width:600px){.ice-cinematic{height:clamp(330px,47vh,460px)}}
 </style></head><body><div class="ice-intro" id="iceIntro" role="dialog" aria-modal="true" aria-label="Introductie: van de laatste ijstijd naar vandaag" hidden>
-<div class="ice-intro-inner"><div class="ice-intro-top"><strong>WINTERRADAR · CINEMATISCHE 3D-RUIMTEINTRO V5</strong><button id="iceSkip" type="button">Intro overslaan ✕</button></div>
+<div class="ice-intro-inner"><div id="iceBuildDiagnostic" style="position:relative;z-index:20;font-size:11px;color:#a6e7ff;letter-spacing:.06em">BUILD V5 · 6FE6D710 · 3D-STATUS: LADEN</div><div class="ice-intro-top"><strong>WINTERRADAR · CINEMATISCHE 3D-RUIMTEINTRO V5</strong><button id="iceSkip" type="button">Intro overslaan ✕</button></div>
 <h2 id="iceTitle">21.000 jaar geleden · de laatste ijstijd</h2>
 <div class="ice-stage ice-cinematic" aria-label="Filmische ruimteanimatie met draaiende aarde, zon en schematische aardbaan">
 <div class="ice-film-label">WINTERRADAR · SPACE FILM V5</div><div id="ice3dMount" class="ice-3d-mount" aria-hidden="true"></div><div class="ice-stars ice-stars-near"></div><div class="ice-stars ice-stars-far"></div><div class="ice-nebula"></div>
@@ -544,7 +544,7 @@ const stage=document.querySelector(".ice-cinematic"),mount=document.getElementBy
 if(!stage||!mount)return;
 const cdn="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.152.2/three.min.js";
 function start(){
-const T=window.THREE;if(!T)return;
+const T=window.THREE;if(!T){const d=document.getElementById("iceBuildDiagnostic");if(d)d.textContent="BUILD V5 · 3D-BIBLIOTHEEK ONTBREEKT";return;}
 let renderer;
 try{renderer=new T.WebGLRenderer({antialias:true,alpha:true,powerPreference:"low-power"});}catch(e){return;}
 renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
@@ -588,10 +588,10 @@ if(w&&h)renderer.render(scene,camera);
 requestAnimationFrame(frame)
 }
 renderer.domElement.addEventListener("webglcontextlost",e=>{e.preventDefault();disposed=true;stage.classList.remove("ice-3d-active")});
-stage.classList.add("ice-3d-active");requestAnimationFrame(frame);
+stage.classList.add("ice-3d-active");const diag=document.getElementById("iceBuildDiagnostic");if(diag)diag.textContent="BUILD V5 · 6FE6D710 · 3D-STATUS: ACTIEF";requestAnimationFrame(frame);
 }
 if(window.THREE){start();return}
-const tag=document.createElement("script");tag.src=cdn;tag.async=true;tag.onload=start;tag.onerror=()=>{};document.head.appendChild(tag);
+const tag=document.createElement("script");tag.src=cdn;tag.async=true;tag.onload=start;tag.onerror=()=>{const d=document.getElementById("iceBuildDiagnostic");if(d)d.textContent="BUILD V5 · 3D-CDN GEBLOKKEERD";};document.head.appendChild(tag);
 })();
 </script><script id="iceage-intro-script">
 (function(){
