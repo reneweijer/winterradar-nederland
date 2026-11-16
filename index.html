@@ -175,15 +175,40 @@
 @keyframes ice-star-drift{to{transform:translate3d(40px,25px,0)}}@keyframes ice-planet-rotate{to{background-position:170% 0}}
 @media(max-width:600px){.ice-cinematic{height:clamp(270px,38vh,360px)}.ice-cinematic .ice-sun{left:17%;width:88px}.ice-cinematic .ice-orbit{left:53%;width:85%;height:73%}.ice-earth-holder{left:63%;top:34%;width:110px}.ice-stage-caption{font-size:9px}.ice-stage-pill{letter-spacing:0}.ice-sun-halo{left:17%}.ice-sun-beams{left:17%}}
 @media(prefers-reduced-motion:reduce){.ice-cinematic *{animation:none!important}}
+</style><style id="ice-space-film-v4">
+.ice-intro{background:#02050d}
+.ice-intro-inner{width:min(1120px,100%)}
+.ice-intro h2{font-size:clamp(26px,4.3vw,47px);background:linear-gradient(100deg,#fff,#b7eaff 72%,#fff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.ice-cinematic{height:clamp(340px,52vh,550px);border-radius:22px;border-color:#537c9b;box-shadow:0 25px 95px #000b,0 0 50px #2a79a922;perspective:900px}
+.ice-cinematic:after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(115deg,transparent 28%,#e7f5ff0c 30%,transparent 35%),radial-gradient(ellipse at 30% 50%,#ffb74d0a,transparent 58%);z-index:7}
+.ice-cinematic .ice-sun{width:clamp(115px,18vw,215px);left:17%;background:radial-gradient(circle at 38% 34%,#fff 0%,#fff8cf 14%,#ffe08c 33%,#fca62d 60%,#e05a16 85%,#903016 100%);box-shadow:0 0 20px #fff5d7,0 0 65px 18px #ffb63d9c,0 0 160px 60px #ff9b3138;animation:ice-sun-pulse 3.7s ease-in-out infinite,ice-sun-wobble 18s ease-in-out infinite}
+.ice-cinematic .ice-sun:after{content:"";position:absolute;inset:-13%;border-radius:50%;background:repeating-conic-gradient(from 5deg,#ffe6a500 0deg,transparent 12deg 26deg,#ffae4629 31deg 38deg,transparent 45deg 63deg);filter:blur(9px);animation:ice-corona 25s linear infinite;z-index:-1}
+.ice-cinematic .ice-earth-path{animation:ice-orbit-spin 24s linear infinite}
+.ice-earth-holder{width:clamp(125px,19vw,210px);left:70%;top:34%;animation:ice-earth-float 7s ease-in-out infinite}
+.ice-cinematic .ice-earth{background:radial-gradient(circle at 25% 30%,#a9dfff,#1b81c7 42%,#032c62 83%);box-shadow:inset -30px -9px 30px #001020,0 0 2px 2px #c8f0ff,0 0 30px #59b7ffb3;transform:rotate(calc(-1 * var(--ice-axis,23.44deg)))}
+.ice-earth-surface{inset:0;border-radius:50%;background-color:#15558d;background-size:200% 100%;background-repeat:repeat-x;animation:ice-globe-turn 12s linear infinite}
+.ice-clouds{background:repeating-linear-gradient(158deg,transparent 0 22px,#f4fbff55 23px 27px,transparent 31px 56px);animation:ice-cloud-shift 17s linear infinite}
+.ice-earth-shadow{background:radial-gradient(circle at 22% 38%,transparent 13%,#00152b11 35%,#000817d9 85%);box-shadow:inset -25px -5px 30px #000c}
+.ice-orbit{transition:transform 2s,border-radius 2s}
+.ice-film-label{position:absolute;top:15px;right:18px;color:#cceaff;letter-spacing:1.5px;font-size:10px;z-index:9;text-shadow:0 2px 8px #000}
+.ice-intro .ice-metric{background:linear-gradient(135deg,#133952,#0b2036);border-color:#426b84;box-shadow:inset 0 1px #a9e8ff1c}
+.ice-stage-caption{bottom:17px}
+@keyframes ice-globe-turn{from{background-position:0% 0}to{background-position:200% 0}}
+@keyframes ice-cloud-shift{to{background-position:140px 0}}
+@keyframes ice-corona{to{transform:rotate(360deg)}}
+@keyframes ice-sun-wobble{50%{filter:brightness(1.18)}}
+@keyframes ice-earth-float{50%{translate:0 -8px}}
+@media(max-width:600px){.ice-cinematic{height:clamp(290px,41vh,380px)}.ice-earth-holder{width:125px;left:64%;top:33%}.ice-cinematic .ice-sun{width:100px;left:15%}.ice-film-label{font-size:8px;right:10px}.ice-intro h2{font-size:clamp(23px,6vw,32px)}}
+@media(prefers-reduced-motion:reduce){.ice-cinematic *{animation:none!important}}
 </style></head><body><div class="ice-intro" id="iceIntro" role="dialog" aria-modal="true" aria-label="Introductie: van de laatste ijstijd naar vandaag" hidden>
-<div class="ice-intro-inner"><div class="ice-intro-top"><strong>WINTERRADAR · RUIMTEINTRO V3 · 16 NOV 2026</strong><button id="iceSkip" type="button">Intro overslaan ✕</button></div>
+<div class="ice-intro-inner"><div class="ice-intro-top"><strong>WINTERRADAR · CINEMATISCHE RUIMTEINTRO V4</strong><button id="iceSkip" type="button">Intro overslaan ✕</button></div>
 <h2 id="iceTitle">21.000 jaar geleden · de laatste ijstijd</h2>
 <div class="ice-stage ice-cinematic" aria-label="Filmische ruimteanimatie met draaiende aarde, zon en schematische aardbaan">
-<div class="ice-stars ice-stars-near"></div><div class="ice-stars ice-stars-far"></div><div class="ice-nebula"></div>
+<div class="ice-film-label">WINTERRADAR · SPACE FILM V4</div><div class="ice-stars ice-stars-near"></div><div class="ice-stars ice-stars-far"></div><div class="ice-nebula"></div>
 <div class="ice-sun-halo"></div><div class="ice-sun-beams"></div><div class="ice-sun"></div>
 <div class="ice-orbit ancient" id="iceOrbit"></div>
 <div class="ice-earth-path"><div class="ice-earth-holder"><div class="ice-earth-axis" id="iceAxis"><div class="ice-earth" id="iceEarth"><div class="ice-earth-surface"></div><div class="ice-clouds"></div><div class="ice-earth-shadow"></div></div></div><div class="ice-axis-caption">23,4°</div></div></div>
-<div class="ice-stage-caption"><span class="ice-stage-pill">● RUIMTECAMERA · V3</span><span>Rotatie aarde · omloop schematisch versneld</span></div>
+<div class="ice-stage-caption"><span class="ice-stage-pill">● RUIMTECAMERA · V4</span><span>Rotatie aarde · omloop schematisch versneld</span></div>
 </div>
 <div class="ice-metrics"><div class="ice-metric"><span>Aardashelling</span><strong id="iceTilt">circa 22,9°</strong></div><div class="ice-metric"><span>Afstand aarde–zon</span><strong id="iceDistance">Verandert tijdens de baan</strong></div><div class="ice-metric"><span>Aardbaan</span><strong id="iceOrbitText">Licht elliptisch</strong></div></div>
 <p id="iceNarration">Tijdens het Laatste Glaciale Maximum bedekten enorme ijskappen delen van Noord-Amerika en Europa. Veranderingen in de baan en de aardas beïnvloedden de verdeling van zonlicht over seizoenen.</p>
@@ -476,7 +501,34 @@ function renderHistorical(){const w=HIST.winter_series;function correlation(x,y)
 const all=w.filter(o=>Number.isFinite(o.nao)&&Number.isFinite(o.temperature_c)),xmn=-4,xmx=4,ymn=-4,ymx=8,W=660,H=300,P={l:47,r:20,t:18,b:37};const x=v=>P.l+(v-xmn)/(xmx-xmn)*(W-P.l-P.r),y=v=>P.t+(ymx-v)/(ymx-ymn)*(H-P.t-P.b);let svg='<svg class="chart" viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none">';for(let t=-4;t<=4;t+=2)svg+='<line x1="'+x(t)+'" x2="'+x(t)+'" y1="'+P.t+'" y2="'+(H-P.b)+'" stroke="#305067" stroke-dasharray="2 5"/><text x="'+x(t)+'" y="'+(H-12)+'" fill="#92b0c2" text-anchor="middle" font-size="12">'+t+'</text>';for(let t=-4;t<=8;t+=2)svg+='<line x1="'+P.l+'" x2="'+(W-P.r)+'" y1="'+y(t)+'" y2="'+y(t)+'" stroke="#305067" stroke-dasharray="2 5"/><text x="'+(P.l-10)+'" y="'+(y(t)+4)+'" fill="#92b0c2" text-anchor="end" font-size="12">'+t+'</text>';all.forEach(o=>svg+='<circle cx="'+x(o.nao)+'" cy="'+y(o.temperature_c)+'" r="4.5" opacity=".83" fill="'+(o.winter<1988?'#62ccef':'#f1ba7b')+'"><title>Winter '+o.winter+': '+fmt(o.temperature_c)+' °C, NAO '+fmt(o.nao)+'</title></circle>');svg+='<text x="'+W/2+'" y="'+(H-1)+'" text-anchor="middle" fill="#accadd" font-size="12">NAO-index (wintergemiddelde)</text></svg>';$('histScatter').innerHTML=svg;
 $('specialTable').innerHTML=[1963,1979,1985,1996,2010,2018,2023].map(yr=>w.find(x=>x.winter===yr)).filter(Boolean).map(o=>'<tr><td>'+o.winter+'</td><td>'+fmt(o.temperature_c)+' °C</td><td>'+fmt(o.nao)+'</td><td>'+fmt(o.ao)+'</td><td>'+fmt(o.scand)+'</td><td>'+o.wind+'</td></tr>').join('');}
 document.querySelectorAll('[data-tab]').forEach(button=>button.addEventListener('click',()=>{document.querySelectorAll('[data-tab]').forEach(x=>x.classList.toggle('active',x===button));document.querySelectorAll('.page').forEach(x=>x.classList.toggle('hidden',x.id!==button.dataset.tab));window.scrollTo({top:0,behavior:'smooth'})}));renderHistorical();renderAnnual();$('annualType').addEventListener('change',renderAnnual);$('location').addEventListener('change',()=>{latestForecast=null;latestEns=null;lastLoad=0;loadAll()});loadAll();setInterval(()=>{if(Date.now()-lastLoad>12*3600000)loadAll()},60*60000);
-</script><script src="assets/winter-v2.js?v=5"></script><script src="assets/data-health.js?v=1"></script><script src="assets/historical-backtest.js?v=1"></script><script src="assets/kou-radar.js?v=2"></script><script id="iceage-intro-script">
+</script><script src="assets/winter-v2.js?v=5"></script><script src="assets/data-health.js?v=1"></script><script src="assets/historical-backtest.js?v=1"></script><script src="assets/kou-radar.js?v=2"></script><script id="ice-globe-texture-v4">
+(function(){
+"use strict";
+try{
+const canvas=document.createElement("canvas");canvas.width=1024;canvas.height=512;
+const c=canvas.getContext("2d");if(!c)return;
+const W=1024,H=512;
+const ocean=c.createLinearGradient(0,0,0,H);ocean.addColorStop(0,"#164e7c");ocean.addColorStop(.35,"#0964a3");ocean.addColorStop(.72,"#074a82");ocean.addColorStop(1,"#092c57");c.fillStyle=ocean;c.fillRect(0,0,W,H);
+const continents=[
+[[70,70],[115,58],[164,80],[199,100],[216,139],[190,165],[172,197],[137,199],[121,230],[95,204],[65,165],[45,116]],
+[[148,213],[180,211],[207,241],[215,280],[201,320],[177,367],[154,420],[129,437],[113,395],[128,350],[115,309],[129,265]],
+[[400,90],[443,65],[483,76],[516,110],[501,141],[468,151],[455,179],[425,170],[403,137]],
+[[431,188],[473,170],[515,191],[548,236],[546,293],[514,348],[490,393],[458,406],[436,362],[424,310],[406,263]],
+[[493,76],[551,61],[620,72],[683,60],[736,90],[782,83],[848,110],[903,138],[936,180],[904,207],[851,193],[824,235],[789,224],[764,192],[718,200],[674,169],[642,192],[612,165],[578,185],[539,153],[506,155]],
+[[803,327],[845,310],[890,331],[911,368],[884,404],[833,410],[802,378]],
+[[951,156],[975,151],[987,192],[971,218],[946,203]],
+[[346,58],[372,54],[381,87],[359,103],[338,86]]
+];
+const green=c.createLinearGradient(0,0,0,H);green.addColorStop(0,"#a3a98b");green.addColorStop(.35,"#5c9775");green.addColorStop(.68,"#9a9e73");green.addColorStop(1,"#5d837c");
+continents.forEach((pts,i)=>{c.beginPath();pts.forEach(([x,y],j)=>j?c.lineTo(x,y):c.moveTo(x,y));c.closePath();c.fillStyle=green;c.fill();c.strokeStyle="#b4c4a65c";c.lineWidth=2;c.stroke()});
+let seed=424242;const rand=()=>{seed=(1664525*seed+1013904223)>>>0;return seed/4294967296};
+for(let i=0;i<10000;i++){const x=rand()*W,y=rand()*H,r=rand()*2+.25;c.fillStyle=rand()>.5?"#d8e6cb1c":"#00192b24";c.fillRect(x,y,r*2,r)}
+c.fillStyle="#eaf7ffbb";c.fillRect(0,0,W,27);c.fillRect(0,H-26,W,26);
+for(let i=0;i<150;i++){const x=rand()*W,y=rand()*H;const width=15+rand()*110;c.beginPath();c.ellipse(x,y,width,2+rand()*8,-.2,0,Math.PI*2);c.fillStyle="rgba(240,250,255,"+(.035+rand()*.12)+")";c.fill()}
+const globe=document.querySelector(".ice-earth-surface");if(globe)globe.style.backgroundImage="url("+canvas.toDataURL("image/jpeg",.88)+")";
+}catch(err){/* Keep the CSS-rendered Earth if canvas is unavailable. */}
+})();
+</script><script id="iceage-intro-script">
 (function(){
 "use strict";
 const intro=document.getElementById("iceIntro");if(!intro)return;
