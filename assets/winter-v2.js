@@ -159,6 +159,7 @@ function renderMap() {
   if(usable>=0){frameNum=usable;frame=snap.frames[usable];if(e("v2MapTime"))e("v2MapTime").value=String(usable);}
   else frame=null;
  }
+ const select=e("v2MapTime");if(select&&snap?.frames?.length&&select.options.length!==snap.frames.length){select.innerHTML=snap.frames.map((f,i)=>'<option value="'+i+'">'+(f.valid_for?new Date(f.valid_for).toLocaleString("nl-NL",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit",timeZone:"Europe/Amsterdam"}):"Tijdstip "+(i+1))+'</option>').join("");select.value=String(frameNum);}
  const slider=e("mapTimeSlider"),timeLabel=e("mapTimeLabel");if(slider){slider.max=String(Math.max(0,(snap?.frames?.length||1)-1));slider.value=String(frameNum);}if(timeLabel)timeLabel.textContent=frame?.valid_for?"Modeltijd "+new Date(frame.valid_for).toLocaleString("nl-NL",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit",timeZone:"Europe/Amsterdam"}):"Geen actueel modeltijdstip";
  const kind=e("v2MapLayer")?.value||"pressure_hpa";
  const units={pressure_hpa:"hPa",wind10_kmh:"km/u",t850_c:"°C",jet250_kmh:"km/u"};
@@ -198,7 +199,9 @@ function renderMap() {
  const first=pts.findIndex(p=>Number.isFinite(p[kind]));
  if(first>=0)selectSpot(first);
 }
+function browserPrevious(ctx){try{const key="winterradar-prior-"+ctx.location;const raw=localStorage.getItem(key),stored=raw?JSON.parse(raw):null;const today=new Date().toLocaleDateString("sv-SE",{timeZone:"Europe/Amsterdam"});const snapshot=ctx.snapshot||{};const previous=stored&&stored.day!==today&&daysSince(stored.collected_at)>=0&&daysSince(stored.collected_at)<=7?stored:null;if(!snapshot.previous&&previous)snapshot.previous={collected_at:previous.collected_at,forecast:previous.forecast};if(ctx.forecast?.daily?.time?.length&&(!stored||stored.day!==today))localStorage.setItem(key,JSON.stringify({day:today,collected_at:new Date().toISOString(),forecast:{daily:ctx.forecast.daily}}));ctx.snapshot=snapshot;}catch(_){/* Private mode or blocked storage: no fabricated comparison. */}}
 function refresh(ctx){
+ browserPrevious(ctx);
  lastForecast=ctx.forecast;lastEns=ctx.ensemble;lastEast=ctx.snow;lastIndices=ctx.indices;lastSnapshot=ctx.snapshot;lastLoc=ctx.location;
  showAnalysis(lastForecast,lastEns,lastEast,lastIndices,lastSnapshot,lastLoc);
  renderMap();
