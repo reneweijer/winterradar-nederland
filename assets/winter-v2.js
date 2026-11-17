@@ -149,6 +149,28 @@ function mapColor(key,value) {
  if(key==="wind10_kmh")return value>=50?"#f5bd78":value>=25?"#d7e07d":"#71c9e6";
  return value>=160?"#efb57c":value>=100?"#dce38e":"#76c3e7";
 }
+let europeGeography=null,geoAttempted=false;
+function fetchEuropeGeography(){
+ if(geoAttempted)return;geoAttempted=true;
+ fetch("https://cdn.jsdelivr.net/gh/johan/world.geo.json@master/countries.geo.json",{cache:"force-cache"})
+ .then(r=>{if(!r.ok)throw Error("geography unavailable");return r.json()})
+ .then(g=>{if(g&&Array.isArray(g.features)){europeGeography=g.features;renderMap();}})
+ .catch(()=>{});
+}
+function geographySvg(x,y){
+ if(!europeGeography)return "";
+ let paths="";
+ for(const feature of europeGeography){
+  const g=feature.geometry;if(!g)continue;
+  const polygons=g.type==="Polygon"?[g.coordinates]:g.type==="MultiPolygon"?g.coordinates:[];
+  for(const poly of polygons){
+   const ring=poly[0];if(!ring||!ring.some(p=>p[0]>-29&&p[0]<43&&p[1]>34&&p[1]<70))continue;
+   const path=ring.filter(p=>Number.isFinite(p[0])&&Number.isFinite(p[1])).map((p,i)=>(i?"L":"M")+x(p[0]).toFixed(1)+","+y(p[1]).toFixed(1)).join("")+"Z";
+   paths+='<path d="'+path+'" fill="#29465a" stroke="#779ab0" stroke-opacity=".7" stroke-width="1.2"/>';
+  }
+ }
+ return '<g clip-path="url(#wrMapClip)">'+paths+'</g>';
+}
 function renderMap() {
  const dest=e("v2Map");if(!dest)return;
  const snap=lastSnapshot?.europe;
@@ -168,7 +190,7 @@ function renderMap() {
  const pts=frame.points;
  const W=940,H=470,x=lon=>65+(lon+28)/68*800,y=lat=>43+(69-lat)/34*370;
  const bg='<rect x="0" y="0" width="'+W+'" height="'+H+'" rx="14" fill="#10283d"/>';
- let svg='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Geografisch geprojecteerde Europese modelpunten met '+layerLabel[kind]+'">'+bg;
+ let svg='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Europese landsgrenzen met GFS-modelpunten voor '+layerLabel[kind]+'"><defs><clipPath id="wrMapClip"><rect x="45" y="38" width="846" height="390"/></clipPath></defs>'+bg+geographySvg(x,y);
  for(const lon of [-20,-10,0,10,20,30,40]){const xx=x(lon);svg+='<line x1="'+xx+'" y1="40" x2="'+xx+'" y2="427" stroke="#35546c" opacity=".42" stroke-dasharray="3 7"/><text x="'+xx+'" y="453" text-anchor="middle" fill="#86a6b8" font-size="11">'+lon+'°</text>';}
  for(const lat of [40,45,50,55,60,65]){const yy=y(lat);svg+='<line x1="50" y1="'+yy+'" x2="887" y2="'+yy+'" stroke="#35546c" opacity=".42" stroke-dasharray="3 7"/><text x="37" y="'+(yy+4)+'" text-anchor="middle" fill="#86a6b8" font-size="11">'+lat+'°</text>';}
  svg+='<text x="73" y="26" fill="#91c6e3" font-size="15" font-weight="700">NOORDELIJKE ATLANTISCHE OCEAAN</text>';
@@ -207,6 +229,7 @@ function refresh(ctx){
  renderMap();
 }
 function init(){
+ fetchEuropeGeography();
  if(e("v2MapLayer"))e("v2MapLayer").addEventListener("change",renderMap);
  if(e("v2MapTime"))e("v2MapTime").addEventListener("change",renderMap);
  const slider=e("mapTimeSlider");if(slider)slider.addEventListener("input",()=>{e("v2MapTime").value=slider.value;renderMap();});
