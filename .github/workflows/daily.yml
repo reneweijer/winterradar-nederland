@@ -33,7 +33,7 @@ jobs:
           python-version: '3.12'
       - name: Controleer Python en dashboardlogica
         run: |
-          python -m py_compile scripts/update.py scripts/winter_v2.py scripts/data_quality.py scripts/outlook.py
+          python -m py_compile scripts/update.py scripts/winter_v2.py scripts/data_quality.py scripts/outlook.py scripts/winterlab.py
           PYTHONPATH=scripts python scripts/test_data_quality.py
           PYTHONPATH=scripts python scripts/test_outlook.py
           PYTHONPATH=scripts python scripts/test_previous.py
@@ -41,6 +41,7 @@ jobs:
           node --check assets/data-health.js
           node --check assets/historical-backtest.js
           node --check assets/kou-radar.js
+          node --check assets/winterlab.js
           node scripts/test_kou_radar.cjs
       - name: Herstel vorige geldige brongegevens uit cache
         id: restore-weather-cache
@@ -63,8 +64,22 @@ jobs:
               python -c 'import json,pathlib; p=pathlib.Path("data/last_good.json"); json.loads(p.read_text()) if p.exists() and p.stat().st_size else None'
             fi
           fi
+      - name: Herstel WinterLab-archief uit eerdere uitvoering
+        uses: actions/cache/restore@v4
+        with:
+          path: data/winterlab-history.json
+          key: winterlab-history-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            winterlab-history-
       - name: Weergegevens en NAO/AO ophalen
         run: python scripts/update.py
+      - name: Archiveer gedateerde modelverwachting
+        run: python scripts/winterlab.py
+      - name: Bewaar WinterLab-archief voor volgende uitvoering
+        uses: actions/cache/save@v4
+        with:
+          path: data/winterlab-history.json
+          key: winterlab-history-${{ github.run_id }}-${{ github.run_attempt }}
       - name: Bewaar geldige brongegevens voor volgende run
         uses: actions/cache/save@v4
         with:
@@ -76,6 +91,7 @@ jobs:
           mkdir -p dist/data
           cp index.html dist/index.html
           cp data/latest.json dist/data/latest.json
+          cp data/winterlab-history.json dist/data/winterlab-history.json
           cp -R assets dist/assets
           # Pin the NASA/SDO archival photograph to GitHub Pages to avoid
           # cross-origin image blocking in mobile browsers. The page has a
