@@ -35,3 +35,13 @@ Bronnen: [Open-Meteo](https://open-meteo.com/), [NOAA CPC](https://www.cpc.ncep.
 
 ## Problemen oplossen
 Controleer in **Actions** of de laatste uitvoering groen (geslaagd) is. Bij een fout kun je op de uitvoering klikken om de stap en logmelding te lezen. Bij een mislukte bronopvraag worden ontbrekende waarden niet als nul ingevuld.
+
+## Eigen diagnose en WinterLab (november 2026)
+
+- De pagina **Home** toont een zelfstandig berekende modeldiagnose: lokale vorst/ijsdagen, duur van oostelijke wind, Europese 850-hPa-koude en een beperkt drukverschilsignaal. Deze diagnose neemt **geen KNMI-tekst** over.
+- De **KouRadar-hoofdwijzer** toont eerst dagen 0–7; dagen 8–14 blijven apart zichtbaar. De hoogste van beide scores wordt niet langer automatisch als hoofdresultaat gekozen.
+- De GitHub-workflow haalt aanvullend een **afzonderlijke modelverwachting voor Maarssen**, een **GFS-vergelijking voor De Bilt** en **Open-Meteo historische heranalyse** op. Deze optionele extra bronnen zijn niet hetzelfde als KNMI-stationswaarnemingen.
+- **WinterLab** archiveert modeluitgiftes per plaats en model, toont modelbijstellingen en berekent voorlopige gemiddelde absolute fouten ten opzichte van historische heranalyse. De steekproef groeit pas na succesvolle runs. De archiefcache is geen gegarandeerd permanent datawarehouse; voor langdurig onderzoek is persistente opslag nodig.
+- De historische AUC-claim 0,87 is uit de zichtbare prestatiecijfers verwijderd omdat onafhankelijke reproduceerbaarheid nog niet is aangetoond.
+- **Nog niet voltooid:** onafhankelijke KNMI-stationsvalidatie, satelliet-sneeuwbedekkingskaarten, objectieve 500-hPa-blokkadeherkenning, nauwkeurige straalstroomlokalisatie en wetenschappelijk gekalibreerde winterkansen. Het dashboard mag deze niet als vastgestelde feiten presenteren.
+- Alle atmosferische indicaties blijven modelafhankelijk. Een drukverschil tussen enkele steden bewijst geen Scandinavische blokkade; sneeuwdiepte op vijf modelpunten is geen sneeuwbedekkingspercentage; een ruwe poolwervelsteekproef is geen officiële SSW-diagnose.
