@@ -55,6 +55,24 @@ def forecast():
     return api("https://api.open-meteo.com/v1/forecast", params)
 
 
+
+def local_forecast(latitude, longitude, model=None):
+    params=dict(latitude=latitude,longitude=longitude,
+        daily="temperature_2m_min,temperature_2m_max,wind_direction_10m_dominant,snowfall_sum",
+        timezone="Europe/Amsterdam",forecast_days=14)
+    if model: params["models"]=model
+    return api("https://api.open-meteo.com/v1/forecast",params)
+
+def recent_reference():
+    """Open-Meteo historical reanalysis: comparison reference, NOT KNMI station observation."""
+    yesterday=dt.datetime.now(dt.timezone.utc).date()-dt.timedelta(days=2)
+    start=yesterday-dt.timedelta(days=19)
+    return api("https://archive-api.open-meteo.com/v1/archive",dict(
+        latitude=52.101,longitude=5.18,
+        start_date=start.isoformat(),end_date=yesterday.isoformat(),
+        daily="temperature_2m_min,temperature_2m_max",
+        timezone="Europe/Amsterdam"))
+
 def read_daily_index(url, name):
     """Read NOAA's daily-updated CDAS CSV; ignore all missing/future values."""
     observations = []
@@ -184,6 +202,9 @@ def main():
     result["previous"] = previous_snapshot(download, ROOT / "data" / "last_good.json")
     operations = {
         "forecast": forecast,
+        "forecast_maarssen": lambda: local_forecast(52.139,5.041),
+        "forecast_gfs": lambda: local_forecast(52.101,5.18,"gfs_seamless"),
+        "reference_reanalysis": recent_reference,
         "europe": lambda: regional_forecast(api),
         "outlook": lambda: regional_outlook(api),
         "ensemble": lambda: api(
@@ -234,6 +255,9 @@ def main():
     print("DATA QUALITY", json.dumps(result["data_quality"],ensure_ascii=False))
     for source, status in result["source_status"].items():
         print("SOURCE", source, status["state"], status.get("retrieved_at"))
+    result["comparison_sources"]={"forecast_maarssen":"Open-Meteo model, Maarssen 52.139/5.041",
+        "forecast_gfs":"Open-Meteo GFS seamless, De Bilt",
+        "reference_reanalysis":"Open-Meteo historical reanalysis, NOT official KNMI station observation"}
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(json.dumps(result,ensure_ascii=False,separators=(",",":")),encoding="utf-8")
     print("Published data snapshot for", now.isoformat(), "size", OUT.stat().st_size)
