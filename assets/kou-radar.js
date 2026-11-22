@@ -129,7 +129,7 @@ function render(ctx){
  const card=$("krPanel");if(!card)return;
  const near=compute(ctx,"near"),later=compute(ctx,"later");
  const usable=[near,later].filter(x=>isnum(x.score));
- const active=usable.length?usable.reduce((a,b)=>a.score>=b.score?a:b):null;
+ // The primary dial always prioritizes the near-term window, not the highest of two periods.\n const active=isnum(near.score)?near:(isnum(later.score)?later:null);
  const value=active?.score;
  const bothMissing=usable.length===0;
  const label=scoreName(value);
@@ -143,7 +143,7 @@ function render(ctx){
    (value>=63?"Meerdere berekeningen wijzen in dezelfde richting. Controleer nog de spreiding en termijn.":
     value>=43?"Er zijn aanwijzingen voor een mogelijke ontwikkeling richting kou, nog zonder zekerheid.":
     "Er is vooralsnog geen samenhangend sterk signaal voor een koudeperiode.")+
-    " Sterkste signaal: "+period+".";
+    " Hoofdvenster: "+period+"; vergelijk beide afzonderlijke perioden hieronder.";
  $("krWhen").textContent=active?period:"—";
  $("krTrend").textContent=t.label+(isnum(t.delta)?" ("+(t.delta>0?"+":"")+t.delta+")":"");
  $("krConfidence").textContent=active?.confidence||"Onbekend";
