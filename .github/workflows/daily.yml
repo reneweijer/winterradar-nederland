@@ -37,11 +37,13 @@ jobs:
           PYTHONPATH=scripts python scripts/test_data_quality.py
           PYTHONPATH=scripts python scripts/test_outlook.py
           PYTHONPATH=scripts python scripts/test_previous.py
+          PYTHONPATH=scripts python scripts/test_winterlab.py
           node --check assets/winter-v2.js
           node --check assets/data-health.js
           node --check assets/historical-backtest.js
           node --check assets/kou-radar.js
           node --check assets/winterlab.js
+          node --check assets/winterdiagnose.js
           node scripts/test_kou_radar.cjs
       - name: Herstel vorige geldige brongegevens uit cache
         id: restore-weather-cache
