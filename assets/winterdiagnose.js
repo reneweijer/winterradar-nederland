@@ -25,23 +25,35 @@ function diagnose(s){
   const a=mean(min.slice(0,7)),b=mean(g.temperature_2m_min.slice(0,7));
   if(is(a)&&is(b))disagreements.push("GFS versus standaardmodel: "+fmt(Math.abs(a-b))+" °C verschil in gemiddelde minimumtemperatuur");
  }
- const clues=[];
- if(frost>0)clues.push(frost+" modeldagen met nachtvorst");
- if(ice>0)clues.push(ice+" mogelijke ijsdagen");
- if(longest>=2)clues.push(longest+" opeenvolgende dagen met oostelijke dominante wind");
- if(is(cold))clues.push("Oost-Europese 850 hPa-steekproef "+fmt(cold)+" °C");
- if(is(pressure))clues.push("Scandinavië–Londen drukverschil "+fmt(pressure)+" hPa");
+ const signals=[];
+ if(frost>0)signals.push(frost+" van de eerste 7 nachten met berekende vorst");
+ if(ice>0)signals.push(ice+" mogelijke ijsdagen");
+ if(longest>=2)signals.push(longest+" dagen aaneengesloten oostelijke wind");
  const isBlocked=is(pressure)&&pressure>8;
- const conclusion=ice>=2&&longest>=3?"Duidelijk modelmatig koud signaal":
-  frost>=2&&longest>=2?"Samenhangende aanwijzingen voor een koudere fase":
-  frost>=2?"Koude nachten mogelijk, grootschalige aanvoer nog niet overtuigend":
-  "Vooralsnog geen samenhangend sterk wintersignaal";
- const date=s.collected_at?new Date(s.collected_at).toLocaleString("nl-NL",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}):"onbekend";
- const quality=s.source_status?.forecast?.state||"onbekend";
- return '<strong>'+conclusion+'</strong><p>Eigen interpretatie uit modelgegevens, niet overgenomen van het KNMI. '+(clues.length?clues.join(" · ")+".":"Te weinig aanvullende signalen.")+'</p>'+
-  '<p><strong>Blokkade:</strong> '+(isBlocked?"Luchtdrukverschil ondersteunt een hogedruksignaal, maar bewijst geen Scandinavische blokkade.":"Geen overtuigende blokkade vastgesteld met de beschikbare steekproef.")+
-  ' <strong>Modelverschil:</strong> '+(disagreements.join("; ")||"niet beschikbaar")+'.</p>'+
-  '<p class="soft">Modeluitgifte '+date+' · bronstatus '+quality+' · voorspelling, geen waarneming. Sneeuw op vijf modelpunten is geen satelliet-sneeuwbedekking. De precieze straalstroom en SSW-status zijn hiermee niet vastgesteld.</p>';
+ const conclusion=ice>=2&&longest>=3?"Een stevige winterprikkel in de verwachting":
+  frost>=2&&longest>=2?"De kou krijgt voorzichtig voet aan de grond":
+  frost>=2?"Koude nachten in zicht, winterse doorbraak nog onzeker":
+  "Nog geen overtuigende winterse omslag";
+ const intro=frost>=2&&longest>=2?
+  "De komende week laten de modellen een samenhangend kouder patroon zien. Vooral de combinatie van nachtvorst en aanhoudende oostelijke wind valt op.":
+  frost>=2?"Er zijn signalen voor koudere nachten, maar de grootschalige stroming ondersteunt nog geen overtuigende winterse omslag.":
+  "De beschikbare modelgegevens wijzen voorlopig niet op een duidelijk doorzettende koudeperiode.";
+ const fmtDate=s.collected_at?new Date(s.collected_at).toLocaleString("nl-NL",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}):"onbekend";
+ const modelDiff=disagreements.length?disagreements.join("; ")+".":"Nog geen bruikbare tweede modelreeks.";
+ const flow=isBlocked?"De luchtdrukverdeling ondersteunt een hogedruksignaal boven Scandinavië, maar een blokkade is nog niet bevestigd.":
+  "Een uitgesproken Scandinavische blokkade is met deze gegevens nog niet vastgesteld.";
+ const coldText=is(cold)?" De berekende temperatuur op 850 hPa boven Oost-Europa ligt rond "+fmt(cold)+" °C.":"";
+ const details=signals.length?signals.join(" · ")+".":"Nog onvoldoende samenhangende wintersignalen.";
+ return '<div class="wr-diag">'+
+  '<div style="font-size:clamp(1.15rem,3.8vw,1.55rem);font-weight:750;line-height:1.35;margin-bottom:12px">'+conclusion+'</div>'+
+  '<p style="line-height:1.65;margin:0 0 16px">'+intro+'</p>'+
+  '<div style="padding:14px 16px;background:rgba(125,190,220,.08);border:1px solid rgba(145,205,235,.16);border-radius:14px;margin-bottom:16px">'+
+  '<div style="font-size:.72rem;letter-spacing:.1em;font-weight:750;color:#92cde5;margin-bottom:8px">WAT DE MODELLEN LATEN ZIEN</div>'+
+  '<p style="margin:0;line-height:1.6">'+details+coldText+'</p></div>'+
+  '<p style="line-height:1.6;margin:0 0 10px"><strong>Het grotere weerpatroon</strong><br>'+flow+'</p>'+
+  '<p style="line-height:1.6;margin:0 0 12px"><strong>Waar de modellen verschillen</strong><br>'+modelDiff+'</p>'+
+  '<p class="soft" style="font-size:.8rem;line-height:1.5;margin:0">Bijgewerkt '+fmtDate+' · Modelverwachting voor De Bilt · De uitkomst blijft onzeker, vooral op langere termijn.</p>'+
+  '</div>';
 }
 async function refresh(){
  const el=host();if(!el)return;
