@@ -129,7 +129,8 @@ function render(ctx){
  const card=$("krPanel");if(!card)return;
  const near=compute(ctx,"near"),later=compute(ctx,"later");
  const usable=[near,later].filter(x=>isnum(x.score));
- // The primary dial always prioritizes the near-term window, not the highest of two periods.\n const active=isnum(near.score)?near:(isnum(later.score)?later:null);
+ // The primary dial always prioritizes the near-term window, not the highest of two periods.
+ const active=isnum(near.score)?near:(isnum(later.score)?later:null);
  const value=active?.score;
  const bothMissing=usable.length===0;
  const label=scoreName(value);
