@@ -413,8 +413,22 @@ const rs=await Promise.allSettled([fromSnapshot?Promise.resolve(snapshot.forecas
 latestIndices=snapshot?.indices||null;renderIndices(latestIndices);
 latestForecast=rs[0].status==='fulfilled'?rs[0].value:null;latestEns=rs[1].status==='fulfilled'?rs[1].value:null;latestEast=rs[2].status==='fulfilled'?rs[2].value:null;
 setSrc('srcForecast',rs[0].status==='fulfilled');setSrc('srcEns',rs[1].status==='fulfilled');setSrc('srcSnow',rs[2].status==='fulfilled');lastLoad=Date.now();$('stamp').textContent=fromSnapshot?new Date(snapshot.collected_at).toLocaleString('nl-NL')+' (dagelijkse serverupdate)':new Date().toLocaleString('nl-NL')+' (rechtstreeks bij Open-Meteo opgevraagd)';$('updateStatus').textContent=(rs.filter(x=>x.status==='fulfilled').length)+' van 3 gegevensbronnen opgehaald';
-if(latestForecast)renderForecast(latestForecast);else if(!latestForecast){$('tempChart').textContent='De weersverwachting is niet beschikbaar. Probeer later opnieuw.';$('daysTable').innerHTML='<tr><td colspan="7">Live gegevens konden niet worden opgehaald.</td></tr>'}
-renderEns(latestEns);renderSnow(latestEast);renderUpperAir(snapshot?.upper_air);renderVortex(snapshot?.vortex);updateHomeIndicators(latestForecast,latestEns,latestEast,latestIndices);window.__winterCurrent={forecast:latestForecast,ensemble:latestEns,snow:latestEast,indices:latestIndices,snapshot,location:loc};if(window.WinterV2)window.WinterV2.refresh(window.__winterCurrent);if(window.WinterDataHealth)window.WinterDataHealth.update(window.__winterCurrent);if(window.KouRadar)window.KouRadar.update(window.__winterCurrent);b.disabled=false;b.textContent='↻ Vernieuwen';}
+const failures=[];
+function runSection(name,fn){try{fn()}catch(err){failures.push(name+": "+(err?.message||String(err)));console.error("Winterradar "+name,err)}}
+if(latestForecast)runSection("Verwachting",()=>renderForecast(latestForecast));
+else {$('tempChart').textContent='De weersverwachting is niet beschikbaar. Probeer later opnieuw.';$('daysTable').innerHTML='<tr><td colspan="7">Live gegevens konden niet worden opgehaald.</td></tr>';}
+runSection("Ensemble",()=>renderEns(latestEns));
+runSection("Sneeuw",()=>renderSnow(latestEast));
+runSection("Bovenlucht",()=>renderUpperAir(snapshot?.upper_air));
+runSection("Poolwervel",()=>renderVortex(snapshot?.vortex));
+runSection("Home-indicatoren",()=>updateHomeIndicators(latestForecast,latestEns,latestEast,latestIndices));
+window.__winterCurrent={forecast:latestForecast,ensemble:latestEns,snow:latestEast,indices:latestIndices,snapshot,location:loc};
+if(window.WinterV2)runSection("WinterV2",()=>window.WinterV2.refresh(window.__winterCurrent));
+if(window.WinterDataHealth)runSection("Broncontrole",()=>window.WinterDataHealth.update(window.__winterCurrent));
+if(window.KouRadar)runSection("KouRadar",()=>window.KouRadar.update(window.__winterCurrent));
+else {failures.push("KouRadar: script niet geladen");$('krResult').textContent="KouRadar-script niet geladen";}
+if(failures.length){$('updateStatus').textContent="Gedeeltelijke storing: "+failures.join(" | ");if($('krResult').textContent==="Gegevens worden geladen…")$('krResult').textContent="KouRadar kon niet worden berekend";} 
+b.disabled=false;b.textContent='↻ Vernieuwen';}
 
 function updateHomeIndicators(v,ens,east,indices){
  const now=Date.now();
