@@ -45,7 +45,7 @@ function render(){
       <div><span>Winters onderzocht</span><strong>${rows.length}</strong></div>
       <div><span>Koude winters ≤ 1,0 °C</span><strong>${cold}</strong></div>
       <div><span>Hoogste patroonband</span><strong>${top.success} van ${top.n}</strong></div>
-      <div><span>LOO AUC*</span><strong>0,87</strong></div>
+      <div><span>Onafhankelijke voorspelprestatie</span><strong>Niet vastgesteld</strong></div>
     </div>
     <div class="bt-table-wrap"><table class="bt-table">
     <thead><tr><th>Patroonscore</th><th>Winters</th><th>≤ 1,0 °C</th><th>Aandeel</th><th>Gem. wintertemp.</th></tr></thead>
