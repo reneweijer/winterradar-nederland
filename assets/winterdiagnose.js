@@ -7,7 +7,7 @@ const mean=a=>{const v=a.filter(is);return v.length?v.reduce((x,y)=>x+y,0)/v.len
 const fmt=n=>is(n)?n.toFixed(1).replace(".",","):"—";
 const east=n=>is(n)&&n>=45&&n<=135;
 function diagnose(s){
- const d=s.forecast?.daily||{},days=d.time||[];
+ const age=Date.now()-Date.parse(s.collected_at||"");\n if(!Number.isFinite(age)||age>30*3600000)return "Geen actuele eigen conclusie: de laatste modelopname is ouder dan 30 uur of mist een geldig tijdstip.";\n const d=s.forecast?.daily||{},days=d.time||[];
  if(days.length<7)return "Geen verantwoorde eigen conclusie: de actuele 7-daagse modelreeks ontbreekt.";
  const min=d.temperature_2m_min||[],max=d.temperature_2m_max||[],dir=d.wind_direction_10m_dominant||[];
  const frost=min.slice(0,7).filter(x=>is(x)&&x<0).length,ice=max.slice(0,7).filter(x=>is(x)&&x<0).length;
