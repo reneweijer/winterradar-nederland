@@ -210,9 +210,11 @@ def main():
         "ensemble": lambda: api(
             "https://ensemble-api.open-meteo.com/v1/ensemble",
             dict(latitude=52.101,longitude=5.18,
-                 daily="temperature_2m_min,temperature_2m_max",
+                 daily="temperature_2m_min,temperature_2m_max,snowfall_sum",
                  models="ecmwf_ifs025_ensemble",
                  timezone="Europe/Amsterdam",forecast_days=14)),
+        "ensemble_snow_maarssen": lambda: api("https://ensemble-api.open-meteo.com/v1/ensemble", dict(latitude=52.139,longitude=5.041,daily="snowfall_sum",models="ecmwf_ifs025_ensemble",timezone="Europe/Amsterdam",forecast_days=14)),
+        "jet_grid": lambda: api("https://api.open-meteo.com/v1/forecast", dict(latitude=",".join(str(a) for a in range(35,71,5) for b in range(-60,31,15)),longitude=",".join(str(b) for a in range(35,71,5) for b in range(-60,31,15)),hourly="wind_speed_250hPa,wind_direction_250hPa",models="gfs_seamless",forecast_days=3,timezone="UTC")),
         "upper_air": upper_air,
         "vortex": polar_vortex,
         "snow": lambda: api(
