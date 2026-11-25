@@ -45,7 +45,20 @@ jobs:
           node --check assets/winterlab.js
           node --check assets/winterdiagnose.js
           node scripts/test_kou_radar.cjs
+      - name: Hergebruik gepubliceerde data bij codewijziging
+        id: reuse
+        if: github.event_name == 'push'
+        shell: bash
+        run: |
+          mkdir -p data
+          if curl -fsSL --max-time 20 "https://reneweijer.github.io/winterradar-nederland/data/latest.json" -o data/latest.json && curl -fsSL --max-time 20 "https://reneweijer.github.io/winterradar-nederland/data/winterlab-history.json" -o data/winterlab-history.json && python -m json.tool data/latest.json >/dev/null && python -m json.tool data/winterlab-history.json >/dev/null; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            rm -f data/latest.json data/winterlab-history.json
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          fi
       - name: Herstel vorige geldige brongegevens uit cache
+        if: steps.reuse.outputs.ready != 'true'
         id: restore-weather-cache
         uses: actions/cache/restore@v4
         with:
@@ -54,7 +67,7 @@ jobs:
           restore-keys: |
             winterradar-sources-
       - name: Herstel eerste geldige brongegevens uit eerdere geslaagde run
-        if: ${{ hashFiles('data/last_good.json') == '' }}
+        if: ${{ steps.reuse.outputs.ready != 'true' && hashFiles('data/last_good.json') == '' }}
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
@@ -67,6 +80,7 @@ jobs:
             fi
           fi
       - name: Herstel WinterLab-archief uit eerdere uitvoering
+        if: steps.reuse.outputs.ready != 'true'
         uses: actions/cache/restore@v4
         with:
           path: data/winterlab-history.json
@@ -74,15 +88,19 @@ jobs:
           restore-keys: |
             winterlab-history-
       - name: Weergegevens en NAO/AO ophalen
+        if: steps.reuse.outputs.ready != 'true'
         run: python scripts/update.py
       - name: Archiveer gedateerde modelverwachting
+        if: steps.reuse.outputs.ready != 'true'
         run: python scripts/winterlab.py
       - name: Bewaar WinterLab-archief voor volgende uitvoering
+        if: steps.reuse.outputs.ready != 'true'
         uses: actions/cache/save@v4
         with:
           path: data/winterlab-history.json
           key: winterlab-history-${{ github.run_id }}-${{ github.run_attempt }}
       - name: Bewaar geldige brongegevens voor volgende run
+        if: steps.reuse.outputs.ready != 'true'
         uses: actions/cache/save@v4
         with:
           path: data/last_good.json
@@ -112,6 +130,7 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
       - name: Datakwaliteit controleren
+        if: steps.reuse.outputs.ready != 'true'
         shell: bash
         run: |
           python - <<'PY'
