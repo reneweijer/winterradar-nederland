@@ -44,16 +44,9 @@ function diagnose(s){
   "Een uitgesproken Scandinavische blokkade is met deze gegevens nog niet vastgesteld.";
  const coldText=is(cold)?" De berekende temperatuur op 850 hPa boven Oost-Europa ligt rond "+fmt(cold)+" °C.":"";
  const details=signals.length?signals.join(" · ")+".":"Nog onvoldoende samenhangende wintersignalen.";
- return '<div class="wr-diag">'+
-  '<div style="font-size:clamp(1.15rem,3.8vw,1.55rem);font-weight:750;line-height:1.35;margin-bottom:12px">'+conclusion+'</div>'+
-  '<p style="line-height:1.65;margin:0 0 16px">'+intro+'</p>'+
-  '<div style="padding:14px 16px;background:rgba(125,190,220,.08);border:1px solid rgba(145,205,235,.16);border-radius:14px;margin-bottom:16px">'+
-  '<div style="font-size:.72rem;letter-spacing:.1em;font-weight:750;color:#92cde5;margin-bottom:8px">WAT DE MODELLEN LATEN ZIEN</div>'+
-  '<p style="margin:0;line-height:1.6">'+details+coldText+'</p></div>'+
-  '<p style="line-height:1.6;margin:0 0 10px"><strong>Het grotere weerpatroon</strong><br>'+flow+'</p>'+
-  '<p style="line-height:1.6;margin:0 0 12px"><strong>Waar de modellen verschillen</strong><br>'+modelDiff+'</p>'+
-  '<p class="soft" style="font-size:.8rem;line-height:1.5;margin:0">Bijgewerkt '+fmtDate+' · Modelverwachting voor De Bilt · De uitkomst blijft onzeker, vooral op langere termijn.</p>'+
-  '</div>';
+ const metric=(label,value)=>'<div style="padding:12px;border-radius:12px;background:rgba(130,190,225,.09)"><div style="font-size:.75rem;color:#a5c6da">'+label+'</div><div style="font-size:1.65rem;font-weight:750;color:#b9e7ff">'+value+'</div></div>';
+ const complete=a=>a.slice(0,7).length===7&&a.slice(0,7).every(is);
+ return '<div class="wr-diag"><div style="font-size:1.2rem;font-weight:750;margin:8px 0 14px">'+(complete(min)&&complete(max)&&complete(dir)?conclusion:"Onvolledige modelgegevens")+'</div><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px">'+metric("❄ Vorstnachten",complete(min)?frost+" / 7":"—")+metric("↶ Oostenwind",complete(dir)?longest+" d":"—")+metric("850 hPa · Oost-Europa",fmt(cold)+" °C")+metric("Scandinavië – Londen",fmt(pressure)+" hPa")+'</div><details style="margin:12px 0"><summary>Toelichting op de diagnose</summary><p>'+intro+'</p><p>'+flow+'</p><p>'+modelDiff+'</p></details><p class="soft" style="font-size:.75rem">De Bilt · Modelverwachting · '+fmtDate+'</p></div>';
 }
 
 function extra(s){
@@ -95,7 +88,7 @@ async function refresh(){
  try{
   const r=await fetch("./data/latest.json?t="+Date.now(),{cache:"no-store"});
   if(!r.ok)throw Error("bronbestand niet bereikbaar");
-  const s=await r.json();el.innerHTML=diagnose(s)+extra(s);
+  const s=await r.json();el.innerHTML=diagnose(s)+(Date.now()-Date.parse(s.collected_at)<30*3600000?extra(s):"");
  }catch(err){el.textContent="Eigen diagnose tijdelijk niet beschikbaar: "+err.message}
 }
 refresh();
