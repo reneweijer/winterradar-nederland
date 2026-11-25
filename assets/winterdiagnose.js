@@ -57,7 +57,8 @@ function diagnose(s){
 }
 
 function extra(s){
- const parts=[];
+ const parts=[], cards=[];
+ const tile=(label,value,icon)=>`<div style="background:rgba(130,190,225,.07);border:1px solid rgba(130,190,225,.15);border-radius:12px;padding:12px;min-width:0"><div style="font-size:.75rem;color:#a5c6da">${icon} ${label}</div><div style="font-size:1.55rem;font-weight:750;margin-top:5px;color:#e3f4ff">${value}</div></div>`;
  const valid=n=>typeof n==="number"&&Number.isFinite(n);
  const avg=a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:null;
  for(const [name,model,ens] of [["De Bilt",s.forecast,s.ensemble],["Maarssen",s.forecast_maarssen,s.ensemble_snow_maarssen]]){
@@ -70,7 +71,7 @@ function extra(s){
    let run=0,longest=0;for(const x of wind){run=east(x)?run+1:0;longest=Math.max(run,longest)}
    const shares=(d.time||[]).slice(start,end).map(date=>{const i=(e.time||[]).indexOf(date);const v=keys.map(k=>e[k]?.[i]).filter(valid);return v.length>=5?Math.round(100*v.filter(x=>x>=0.1).length/v.length):null}).filter(valid);
    const complete=mins.length===7&&maxs.length===7&&mins.every(valid)&&maxs.every(valid)&&wind.length===7&&wind.every(valid);
-   parts.push(name+" · "+label+": "+(complete?frost+" vorstnachten, "+ice+" ijsdagen, "+longest+" dagen aaneengesloten oostenwind":"onvolledige lokale modeldata")+". "+(shares.length===7?"Hoogste dagelijkse sneeuwfractie: "+Math.max(...shares)+"% van ensembleleden (≥0,1 cm).":"Sneeuwensemble onvoldoende beschikbaar."));
+   cards.push(`<div style="padding:14px;border:1px solid rgba(130,190,225,.2);border-radius:16px;margin:10px 0"><strong>${name} · ${label}</strong><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:12px">${tile("Vorstnachten",complete?frost:"—","❄")}${tile("IJsdagen",complete?ice:"—","🧊")}${tile("Oostenwind",complete?longest+" d":"—","↶")}${tile("Sneeuwfractie",shares.length===7?Math.max(...shares)+"%":"—","❅")}</div><div class="soft" style="font-size:.72rem;margin-top:8px">Langste reeks oostenwind · hoogste dagelijkse ensemblefractie ≥0,1 cm sneeuw</div></div>`);
   }
  }
  const grid=Array.isArray(s.jet_grid)?s.jet_grid:[];
@@ -86,7 +87,7 @@ function extra(s){
  const a=s.outlook?.windows?.near?.t850_c,b=s.outlook?.windows?.late?.t850_c;
  if(valid(a)&&valid(b))parts.push("Vooruitblik: week 2 is boven Oost-Europa "+fmt(Math.abs(b-a))+" °C "+(b<a?"kouder":"warmer")+" op 850 hPa dan week 1. Geen garantie op aanvoer naar Nederland.");
  if(valid(p)&&valid(q))parts.push("Luchtdrukcontrast Scandinavië–Londen: "+fmt(p)+" → "+fmt(q)+" hPa.");
- return '<div style="margin-top:18px"><strong>Verdiepende winteranalyse</strong>'+parts.map(x=>'<p style="line-height:1.55;margin:8px 0">'+x+'</p>').join("")+'<p class="soft">Ensemblefracties zijn modeluitkomsten, geen gekalibreerde winterkansen. Externe controle: <a href="https://www.cpc.ncep.noaa.gov/products/stratosphere/SSW/">NOAA poolwervel</a> · <a href="https://usicecenter.gov/Products/ImsHome">IMS sneeuwdek</a>.</p></div>';
+ return '<div style="margin-top:18px"><strong>Verdiepende winteranalyse</strong>'+cards.join("")+'<h3 style="margin-top:22px">Atmosferische indicatoren</h3>'+[['NAO',s.indices?.nao],['AO',s.indices?.ao],['SCAND',s.indices?.scand]].map(([n,v])=>`<div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid rgba(130,190,225,.15)"><span style="color:${valid(v?.value)?(v.value<0?'#80bfff':'#e8b67c'):'#8996a3'}">●</span><div style="flex:1"><strong>${n}</strong><div class="soft" style="font-size:.78rem">${valid(v?.value)?(v.value<0?'Negatieve fase':'Niet-negatieve fase'):'Geen gegevens'}</div></div><strong>${fmt(v?.value)}</strong></div>`).join('')+parts.map(x=>'<div style="display:flex;gap:12px;padding:12px 0;border-bottom:1px solid rgba(130,190,225,.15)"><span style="color:#80bfff">●</span><div style="font-size:.88rem;line-height:1.5">'+x+'</div></div>').join("")+'<p class="soft">Ensemblefracties zijn modeluitkomsten, geen gekalibreerde winterkansen. Externe controle: <a href="https://www.cpc.ncep.noaa.gov/products/stratosphere/SSW/">NOAA poolwervel</a> · <a href="https://usicecenter.gov/Products/ImsHome">IMS sneeuwdek</a>.</p></div>';
 }
 
 async function refresh(){
